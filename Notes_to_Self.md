@@ -17,9 +17,6 @@ Python, for all its amazing ability out of the box, does not provide you with an
 **md file cheatsheet**
 
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
-
-
-
-
-
-
+---
+**Andrej Karpathy RNN library**
+https://github.com/karpathy/char-rnn
