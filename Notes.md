@@ -59,13 +59,17 @@ In a MIDI file, all NoteOn and NoteOff events are ordered sequentially.
 --- 
 **FINDING**
 
-I was working on bwv733.mid
-It looks like there were errors in this midi file. 
+I have only worked with one single Bach Fugue MIDI File: bwv733.mid
+It looks like there were errors in this midi file. And there might be similar errors on other data files.
 ```
 at track=1: len(NoteOnEvent) = 849
             len(NoteOnEvent) = 850
 ```
-Also, my `preprocessing.py` script gave negative `duration` error. However, when I imported the midi file to Ableton Live and then exported it back and then ran the `preprocessing.py` on it, all the negative `duration` errors were gone!!!
+Also, my `preprocessing.py` script gave negative `duration` error. However, when I imported the midi file to **Ableton Live** and then exported it back and then ran the `preprocessing.py` on it, all the negative `duration` errors were gone!!! and the redundant NOteOff events were also gone. 
+```
+at track=1: len(NoteOnEvent) = 849
+            len(NoteOnEvent) = 849
+```
 
 > I might need to manually import and export the midi files in and out of Ableton Live. 
 
