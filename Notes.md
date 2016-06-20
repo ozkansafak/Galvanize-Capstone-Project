@@ -1,4 +1,4 @@
-
+							June 19, 2016 - Sunday
 
 Deleting .DS_Store remotely on git repo:
 ```javascript
@@ -50,7 +50,9 @@ In a MIDI file, all NoteOn and NoteOff events are ordered sequentially.
 * `velocity` is how hard the note is played. Varies from `0` to `127`.
 * If the `velocity` is set to `0` in a `NoteOnEvent()`, it becomes a `NoteOffEvent()`. 
 
-
+---
+`Source Code/Python MIDI`
+`time_series = 
 
 
 
