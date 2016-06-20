@@ -1,5 +1,6 @@
 import midi
 import re
+import os
 
 def single_note_extractor(m, time):
 	"""
@@ -13,8 +14,8 @@ def single_note_extractor(m, time):
 	tick_p = m.group(1)
 	tick = int(re.findall(r'\d+', tick_p)[0])
 	data_p = m.group(3)
-	data = [int(elem) for elem in  re.findall(r'\D*(\d*)\D+', data_p)]
-	return tick, data, time+tick
+	data = tuple(int(elem) for elem in  re.findall(r'\D*(\d*)\D+', data_p))
+	return tick, data, time + tick
 	
 def extract_melody(track):
 	'''
@@ -47,40 +48,41 @@ def extract_melody(track):
 			
 	return note_on, note_off
 
-
 def time_series_builder(note_on, note_off):
 	'''
-	INPUT: note_on LIST [tick INT, (pitch INT, velocity INT)],
-	 	   note_off LIST [tick INT, (pitch INT, velocity INT)],
-	OUTPUT: note LIST [note INT, duration INT]
+	INPUT: note_on LIST [(tick INT, (pitch INT, velocity INT), time INT)],
+	 	   note_off LIST [(tick INT, (pitch INT, velocity INT), time INT)],
+	OUTPUT: time_series LIST [(time INT, pitch INT, duration INT)]
 	'''
 	time_series = []
 	ind = 0 # index at note_off
-	for ev1 in note_on:
-		pitch = ev1[1][0]
-		time = ev1[2]
-		for ev2 in note_off:
-			if pitch == ev2[1][0]:
-				duration = ev2[2] - time
-				if duration < 0:
-					print 'duration < 0'
-					print 'ev1, ev2', ev1, ev2
+	for ev_on in note_on:
+		pitch = ev_on[1][0]
+		time = ev_on[2]
+		for i, ev_off in enumerate(note_off):
+			if pitch == ev_off[1][0]:
+				duration = ev_off[2] - time
 				note_off.pop(i)
-		time_series.append((time, pitch, duration))
-		
-	return time_series		
+				time_series.append((time, pitch, duration))
+				if duration < 0: print 'duration < 0\n\tev_on, ev_off', ev_on, ev_off
+				break
+				
+	return time_series
 
 if __name__ == '__main__':
-	input_MIDI = './Python MIDI/bwv733.mid'
+	#ls = os.listdir('../MIDI files/jsbach.net')
+	input_MIDI = './Python MIDI/examples/bwv733.mid'
 	tracks = midi.read_midifile(input_MIDI)
-	note_on, note_off = [0 for i in tracks], [0 for i in tracks]
+	note_on, note_off, time_series = \
+			[0 for i in tracks], [0 for i in tracks], [0 for i in tracks]
 	
 	for i, track in enumerate(tracks):
 		note_on[i], note_off[i] = extract_melody(track)
 		if len(note_on[i]) != len(note_off[i]):
-			print 'note_on and note_off are of different lengths'
+			print '''len(note_on)={} and len(note_off)={} @track={}'''\
+			.format(len(note_on[i]),len(note_off[i]),i)
 		
-		time_series = time_series_builder(note_on[i], note_off[i])
+		time_series[i] = time_series_builder(note_on[i], note_off[i])
 		
 
 

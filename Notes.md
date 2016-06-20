@@ -1,5 +1,7 @@
 							June 19, 2016 - Sunday
-
+Believe it or not I accidentally ran `rm -rf /*` on my computer. and left the `.` out of the `./*` part.
+I stopped it when it was going thru `Applications/Evernote.app` directory. It was throwing `Permission denied` error all over the place. But, it deleted Ableton Live and all my instrument patches. I downloaded Ableton from their website. It was easy because I'm a registered customer. And I'll re-install the patches some other time. I hope this is the whole extent of the damage.
+---
 Deleting .DS_Store remotely on git repo:
 ```javascript
 find . -name ".DS_Store" -exec git rm --cached -f {} \;.
@@ -54,9 +56,24 @@ In a MIDI file, all NoteOn and NoteOff events are ordered sequentially.
 `Source Code/Python MIDI`
 `time_series = 
 
+--- 
+**FINDING**
 
+I was working on bwv733.mid
+It looks like there were errors in this midi file. 
+```
+at track=1: len(NoteOnEvent) = 849
+            len(NoteOnEvent) = 850
+```
+Also, my `preprocessing.py` script gave negative `duration` error. However, when I imported the midi file to Ableton Live and then exported it back and then ran the `preprocessing.py` on it, all the negative `duration` errors were gone!!!
 
+> I might need to manually import and export the midi files in and out of Ableton Live. 
 
+Tomorrow: 
+- do more tests to check basic parameters. 
+- import the time_series back to MIDI 
+
+---
 
 
 
