@@ -32,7 +32,6 @@ midi.C_0 => returns 0
 midi.Cs_0 => returns 1  it's C sharp
 midi.Db_0 => returns 1  it's D flat
 midi.D_0 => returns 2
-
 midi.C_1 => returns 12 (one octave above midi.C_0)
 .
 .
