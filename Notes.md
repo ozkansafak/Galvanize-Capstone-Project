@@ -98,7 +98,7 @@ Key guidelines:
 > Stage 2: INPUT: Ignore the Bass Line and consider the new Melody created
 	   OUTPUT: Write a new Melody.
 
-# Interaction btw Bass Lines and Melody Lines
+#### Interaction btw Bass Lines and Melody Lines
 Melody: `1  2  2  1  5  5  5  5  4  6  6  4`
 Bass:   `3  3  3  3  2  2  2  2  4  4  4  4`
 
