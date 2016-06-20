@@ -1,4 +1,4 @@
-							June 19, 2016 - Sunday
+June 19, 2016 - Sunday
 
 Believe it or not, I accidentally ran `rm -rf /*` on my computer. and left the `.` out of the `./*` part.
 
@@ -81,12 +81,26 @@ Tomorrow:
 - import the time_series back to MIDI 
 
 ---
+June 19, 2016 - Sunday
 
+Had a great meeting/ Brainstorming session with Kamil.
+Key guidelines:
+# pre-processing Helper Functions. 
+> Stage 0: MIDI to TimeSeries -- finished
+> Stage 1: TimeSeries to MIDI -- today
+> Stage 2: TimeSeries to ChordSequence
+> Stage 3: ChordSequence to Key
 
+# Over all vision of RNN Model:
+> Stage 0: Key & Chord Sequence Prediction
+> Stage 1: INPUT: Bass line
+	   OUTPUT: Generate a Melody
+> Stage 2: INPUT: Ignore the Bass Line and consider the new Melody created
+	   OUTPUT: Write a new Melody.
 
-
-
-
+# Interaction btw Bass Lines and Melody Lines
+Melody: `1  2  2  1  5  5  5  5  4  6  6  4`
+Bass:   `3  3  3  3  2  2  2  2  4  4  4  4`
 
 
 
