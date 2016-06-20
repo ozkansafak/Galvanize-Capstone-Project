@@ -57,10 +57,11 @@ In a MIDI file, all NoteOn and NoteOff events are ordered sequentially.
 
 ---
 `Source Code/Python MIDI`
-`time_series = 
+preprocessing Stage 0 finished
+`OUTPUT: time_series LIST = [(time, pitch, duration), (...), (...)]`
 
 --- 
-**FINDING**
+**IMPORTANT FINDING**
 
 I have only worked with one single Bach Fugue MIDI File: bwv733.mid
 It looks like there were errors in this midi file. And there might be similar errors on other data files.
