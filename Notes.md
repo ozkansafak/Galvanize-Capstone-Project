@@ -74,7 +74,7 @@ at track=1: len(NoteOnEvent) = 849
             len(NoteOffEvent) = 849
 ```
 
-> I might need to manually import and export the midi files in and out of Ableton Live. 
+> I might need to manually import and export the midi files in and out of Ableton Live before feeding them to RNN as training set. 
 
 Tomorrow: 
 - do more tests to check basic parameters. 
