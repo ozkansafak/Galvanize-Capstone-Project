@@ -45,7 +45,10 @@ midi.G_10 => returns 127 (highest note on MIDI)
 midi.NoteOnEvent(tick=24, channel=0, data=[62, 127]),
 ```
 
-In a MIDI file, all NoteOn and NoteOff events are ordered sequentially. The `tick` argument is set to the number of ticks after the most recent NoteOn or NoteOff Event. The  `data` argument is equal to [pitch, velocity] of the current note. If the velocity is set to 0 in a NoteOnEvent, it is equal to a NoteOffEvent. 
+In a MIDI file, all NoteOn and NoteOff events are ordered sequentially. 
+* The `tick` argument is set to tick count after the most recent NoteOn or NoteOff Event. 
+* `data` argument is equal to `[pitch, velocity]` of the current note. 
+* If the velocity is set to 0 in a NoteOnEvent(), it is a NoteOffEvent(). 
 
 
 
