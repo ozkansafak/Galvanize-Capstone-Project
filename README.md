@@ -22,7 +22,7 @@
 
 > `..Bass: 3  3  3  3  2  2  2  2 |4|4  4  4`
 
-Set up the RNN such that the melody note at `time = t` is influenced by a melody note a `time = t-1` and bass melody at `time = t`
+Set up the RNN such that the melody note at `time = t` is influenced by a melody note at `time = t-1` and bass note at `time = t`
 
 
 
