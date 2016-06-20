@@ -1,4 +1,4 @@
-June 19, 2016 - Sunday
+*June 19, 2016 - Sunday*
 
 Believe it or not, I accidentally ran `rm -rf /*` on my computer. and left the `.` out of the `./*` part.
 
@@ -82,7 +82,7 @@ Tomorrow:
 
 ---
 
-June 19, 2016 - Sunday
+*June 20, 2016 - Monday*
 
 Had a great meeting/ Brainstorming session with Kamil.
 Key guidelines:
@@ -92,16 +92,17 @@ Key guidelines:
 > Stage 2: TimeSeries to ChordSequence
 > Stage 3: ChordSequence to Key
 
-** Over all vision of RNN Model: **
+**Over all vision of RNN Model:**
 > Stage 0: Key & Chord Sequence Prediction
 > Stage 1: INPUT: Bass line
 	   OUTPUT: Generate a Melody
 > Stage 2: INPUT: Ignore the Bass Line and consider the new Melody created
 	   OUTPUT: Write a new Melody.
 
-** Interaction btw Bass Lines and Melody Lines **
-Melody: `1  2  2  1  5  5  5 |5| |4| 6  6  4`
-Bass:   `3  3  3  3  2  2  2  2  |4| 4  4  4`
+**Interaction btw Bass Lines and Melody Lines**
+> `Melody: 1  2  2  1  5  5  5 |5| |4| 6  6  4`
+
+> `Bass:   3  3  3  3  2  2  2  2  |4| 4  4  4`
 
 Set up the RNN such that the melody note at `time = t` is influenced by a melody note a `time = t-1` and bass melody at `time = t`
 
