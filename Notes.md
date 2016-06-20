@@ -47,7 +47,8 @@ midi.NoteOnEvent(tick=24, channel=0, data=[62, 127]),
 In a MIDI file, all NoteOn and NoteOff events are ordered sequentially. 
 * The `tick` argument is set to tick count after the most recent NoteOn or NoteOff Event. 
 * `data` argument is equal to `[pitch, velocity]` of the current note. 
-* If the velocity is set to 0 in a NoteOnEvent(), it is a NoteOffEvent(). 
+* `velocity` is how hard the note is played. Varies from `0` to `127`.
+* If the `velocity` is set to 0 in a `NoteOnEvent()`, it becomes a `NoteOffEvent()`. 
 
 
 
