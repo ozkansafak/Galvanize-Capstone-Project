@@ -1,5 +1,6 @@
 							June 19, 2016 - Sunday
-Believe it or not I accidentally ran `rm -rf /*` on my computer. and left the `.` out of the `./*` part.
+Believe it or not, I accidentally ran `rm -rf /*` on my computer. and left the `.` out of the `./*` part.
+
 I stopped it when it was going thru `Applications/Evernote.app` directory. It was throwing `Permission denied` error all over the place. But, it deleted Ableton Live and all my instrument patches. I downloaded Ableton from their website. It was easy because I'm a registered customer. And I'll re-install the patches some other time. I hope this is the whole extent of the damage.
 ---
 Deleting .DS_Store remotely on git repo:
