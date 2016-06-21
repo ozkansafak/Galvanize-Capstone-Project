@@ -23,9 +23,9 @@ def single_note_extractor(m, time):
 def extract_melody(track):
 	'''
 	INPUT: 	track MIDI.TRACK([...]) OBJECT
-	OUTPUT: note_on LIST [(tick INT, (pitch INT, velocity INT), time INT)],
+	OUTPUT: note_on LIST [(tick INT, (pitch INT, velocity INT), time INT), ...],
 			
-			note_off LIST [(tick INT, (pitch INT, velocity INT), time INT)]
+			note_off LIST [(tick INT, (pitch INT, velocity INT), time INT), ...]
 	'''
 	note_on, note_off, time = [], [], 0
 	for line in track:
@@ -53,8 +53,8 @@ def extract_melody(track):
 
 def time_series_builder(note_on, note_off):
 	'''
-	INPUT: note_on LIST [(tick INT, (pitch INT, velocity INT), time INT)],
-	 	   note_off LIST [(tick INT, (pitch INT, velocity INT), time INT)],
+	INPUT: note_on LIST [(tick INT, (pitch INT, velocity INT), time INT), ...],
+	 	   note_off LIST [(tick INT, (pitch INT, velocity INT), time INT), ...],
 	OUTPUT: time_series LIST [(time INT, pitch INT, duration INT)]
 	'''
 	time_series = []
@@ -78,7 +78,7 @@ if __name__ == '__main__':
 	OUTPUT: time_series_list
 	"""
 	#ls = os.listdir('../MIDI files/jsbach.net')
-	input_MIDI = './Python MIDI/examples/bwv733.mid'
+	input_MIDI = 'bwv733.mid'
 	tracks = midi.read_midifile(input_MIDI)
 	note_on, note_off, time_series_list = \
 			[0 for i in tracks], [0 for i in tracks], [0 for i in tracks]
@@ -88,7 +88,7 @@ if __name__ == '__main__':
 		if len(note_on[i]) != len(note_off[i]):
 			print '''len(note_on)={} and len(note_off)={} @track={}'''\
 			.format(len(note_on[i]),len(note_off[i]),i)
-		print i
+		
 		time_series_list[i] = time_series_builder(note_on[i], note_off[i])
 		
 
