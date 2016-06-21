@@ -19,6 +19,7 @@
 ```
 **Interaction btw Bass Lines and Melody Lines**
 ```
+...........................(t-1)t  t+1 ....
 Melody: 1  2  2  1  5  5  5 |5||4| 6  6  4
 
 ..Bass: 3  3  3  3  2  2  2  2 |4| 4  4  4
