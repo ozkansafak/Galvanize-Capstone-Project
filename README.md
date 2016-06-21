@@ -19,10 +19,10 @@
 ```
 **Interaction btw Bass Lines and Melody Lines**
 ```
-...........................(t-1)t  t+1 ....
-Melody: 1  2  2  1  5  5  5 |5||4| 6  6  4
+..................................(t-1).t............
+Melody: 1---2---2---1---5---5---5--|5|-|4|--6---6---4
 
-..Bass: 3  3  3  3  2  2  2  2 |4| 4  4  4
+..Bass: 1---3---3---3---2---2---2---2--|4|--4---4---4
 ```
 
 Set up the RNN such that the melody note at `time = t` is influenced by a melody note at `time = t-1` and bass note at `time = t`
