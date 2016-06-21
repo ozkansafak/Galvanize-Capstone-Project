@@ -1,6 +1,6 @@
 ### An Artificial Fugue Generator using RNNs
 
-**Overall vision of RNN Model:**
+**A crude road Map of this project:**
 ``` 
 - Stage 0: Key & Chord Sequence Prediction
 - Stage 1: INPUT: Bass line
