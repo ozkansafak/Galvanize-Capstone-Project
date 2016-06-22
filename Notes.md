@@ -86,7 +86,7 @@ Tomorrow:
 *June 20, 2016 - Monday*
 
 Had a great meeting/ Brainstorming session with Kamil.
-**A crude road Map of this project:**
+**A crude Road Map:**
 ``` 
 - Stage 0: Key & Chord Sequence Prediction
 - Stage 1: INPUT: Bass line
@@ -113,10 +113,32 @@ Melody: 1---2---2---1---5---5---5--|5|-|4|--6---6---4
 
 Set up the RNN such that the melody note at `time = t` is influenced by a melody note at `time = t-1` and bass note at `time = t`
 
+---
+
+*June 21, 2016 - Tuesday*
 
 
+**Pipe Line**
+```
+          (import)      (export) |bwv733_t1.mid| (merger)
+bwv733.mid ----> Ableton ------> |bwv733_t2.mid| -------> bwv733_io.mid
+                                 |bwv733_t3.mid|
+```
+when `bwv733.mid` is imported into and exported out of Ableton the timeSignature info in the midi file gets modified. I tried to reimport it from the oroginal `bwv733.mid` file to no avail. 
+I'll abandon this endeavor now and instead will write a script to get the note value info based on all the tracks in the midi file. 
 
-
+**chords**
+```
+0 [ 1.   -0.1   0.1   0.75 -1.    0.3  -0.1   0.75  0.1  -0.1   0.3  -0.1 ] minor
+1 [ 1.   -0.1   0.1   0.75 -1.    0.3  -0.1   0.75  0.1  -0.1  -0.1   0.3 ] minor_harmonic
+2 [ 1.    0.1  -0.1   0.75 -1.   -0.1   0.75  0.1  -0.1   0.3  -0.1  -0.1 ] minor_diminished
+3 [ 1.   -0.1   0.1   0.75 -1.    0.3   0.75 -0.1   0.1  -0.1   0.3  -0.1 ] minor_half_diminished
+4 [ 1.   -0.1   0.1  -1.    0.75  0.3  -0.1   0.75 -0.1   0.1  -0.1   0.3 ] major
+5 [ 1.   -0.1   0.1  -1.    0.75 -0.1   0.3   0.75 -0.1   0.1  -0.1   0.3 ] major_augmented
+6 [ 1.   -0.1   0.1  -1.    0.75  0.3  -0.1   0.75 -0.1   0.1   0.3  -0.1 ] dominant
+7 [ 1.    0.1  -0.1   0.75  0.3  -0.1   0.75 -0.1   0.1  -0.1   0.3  -0.1 ] dominant_altered
+8 [ 1.   -0.1   0.1  -0.1   0.75 -0.1   0.3   0.75 -0.1   0.1   0.3  -0.1 ] dominant_sharp_11
+```
 
 
 
