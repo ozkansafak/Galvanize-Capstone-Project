@@ -64,11 +64,26 @@ def note_value(time_series_list):
 	l = list(s)
 	l.sort()
 	
-	for i in range(1, len(l)):
-		ratio = l[i]/96. # 96 ticks to a quarter note
-		print 'note_values in current file: {}'.format(ratio)
+	# for i in range(1, len(l)):
+	# 	ratio = l[i]/96. # 96 ticks to a quarter note
+	# 	print 'note_values in current file: {}'.format(ratio)
 	
 	return l
+
+
+def predict_chord(time_series_list, time=96*4*10):
+	
+	dum = []
+	for time_series in time_series_list:
+		dum.append([elem for elem in time_series if elem[0] >= time])
+
+	bar = 96 * 4
+	slyce =[]
+	for time_series in dum:
+		slyce.append([elem for elem in time_series if elem[0] < time + bar])
+	
+	return slyce
+
 
 if __name__ == '__main__':
 	"""
@@ -91,13 +106,24 @@ if __name__ == '__main__':
 		out = time_series_builder(note_on[i], note_off[i])
 		if len (out) > 0:
 			time_series_list.append(out)
-		
 
+	# # # # # # # 
 	l = note_value(time_series_list)
-
+	# # # # # # # 
+	
+	slyce = predict_chord(time_series_list)
+	
+	set_of_pitches = []
+	for ts in slyce:
+		for elem in ts:
+			set_of_pitches.append(elem[1])
+	
+	from preprocess_2 import *
+	i, chord_type = find_chord_w_transpose(set_of_pitches)
+	print chord_type
 		
 
-
+	# import preprocess_2
 
 
 

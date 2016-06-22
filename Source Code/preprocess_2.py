@@ -5,7 +5,7 @@ D = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 def cosine_similarity(x,y):
 	
 	num = x.dot(y)
-	denom = np.sqrt(x.dot(x)) * np.sqrt(y.dot(y))
+	denom = np.linalg.norm(x) * np.linalg.norm(y)
 	return num/float(denom)
 
 
@@ -21,59 +21,93 @@ def note_name(pitch):
 	
 	return octave, note
 
+
 def build_chords_vocabulary():
 	'''
-	INPUT: set SET, chord STR
-	OUPUT: distance FLOAT
+	OUTPUT: chords_vocabulary (12 by 1) LIST of chord objects, 
+			canonical_chord_vectors (n by 12) NP.ARRAY of 
+			vector representation of chords 
+	
 	'''
 
 	class chord(object):
 		def __init__(self, name, lst):
 			# weight constants
+			e = .15 # ordinary notes in the scale
 			root = 1
-			third = .75
-			fourth = .3
-			fifth = .75
-			seventh = .3
-			e = .1 # all other notes in the scale
+			third = 5*e
+			forth = 2*e
+			fifth = 5*e
+			seventh = 2*e
 			
 			self.notes = np.array(lst)
 	 		self.name = name
 			
-			self.wt = np.array([-e for i in range(12)])
+			# probability of chromatic notes
+			self.wt = np.array([-e/2 for i in range(12)]) 
 			self.wt[lst[0]] = root
 			self.wt[lst[1]] = e
 			self.wt[lst[2]] = third
-			self.wt[lst[3]] = fourth
+			self.wt[lst[3]] = forth
 			self.wt[lst[4]] = fifth
 			self.wt[lst[5]] = e
 			self.wt[lst[6]] = seventh
 			
-			# punish the wrong thirds by -10*e
+			# Basic Notion: * punish wrong 3rd and 7ths
+			#               * reward color tones
 			if self.name[0:5] == 'minor':
-				self.wt[4] = -10*e
+				self.wt[4] = -10*e # punish wrong 3rd
 			elif self.name[0:5] == 'major':
-				self.wt[3] = -10*e
-			elif (self.name[0:8] == 'dominant') | (self.name != 'dominant_altered'):
-				self.wt[3] = -10*e
-				
-			if self.name != 'dominant_altered':
+				self.wt[3] = -10*e # punish wrong 3rd
+				self.wt[10] = -10*e # punish wrong 7th
+			elif self.name == 'dominant':
+				self.wt[3] = -10*e # minor 3rd
+				self.wt[10] = -10*e # punish wrong 7th
+			elif self.name == 'dominant_altered': 
 				# [0, 1, 3, 4, 6, 8, 10]
-				self.wt[lst[2]] = e # minor 3rd
-				self.wt[lst[3]] = third # raise the value of major 3rd
-				self.wt[lst[4]] = e # cut down fifth
+				self.wt[5] = -10*e # punish 4th
+
+				self.wt[lst[3]] = third # swap minor 3rd and major 3rd
+				self.wt[lst[2]] = forth # ...
+				self.wt[lst[2]] = 2*e # minor 3rd. raise value over an ordinary note
+				self.wt[lst[5]] = 2*e # sharp 5. put it back
+				self.wt[1] = 2*e # flat 9th
+				self.wt[11] = -10*e
+			elif self.name == 'dominant_sharp_11':
+				self.wt[3] = -10*e
+				self.wt[5] = -10*e # punish 4th
+				self.wt[11] = -10*e
+				self.wt[6] += e # add to #11
+				self.wt[lst[1]] -= e/2 # subtract back what you added
+				self.wt[lst[5]] -= e/2
 				
-		# e.g.
-		# self.notes = [0, 2, 3, 5, 7, 8, 10]
-		# self.wt = [1, -0.1, 0.1, 0.75, -0.5, 0.3, -0.1, 0.75, 0.1, -0.1, 0.3, -0.1]
-		# self.name = 'minor'
+			if self.name == 'minor_diminished':
+				self.wt[11] += e
+			if self.name =='minor_harmonic':
+				self.wt[11] = 2*e
+			if self.name =='major_augmented':
+				self.wt[8] += 4*e 
+				self.wt[7] =  2*e 				
+			if self.name =='minor_melodic':
+				self.wt[11] = 3*e
+				self.wt[9] = 3*e
+				
+			# normalize
+			self.wt = self.wt/np.linalg.norm(self.wt)
+			
+	# e.g.
+	# self.notes = [0, 2, 3, 5, 7, 8, 10]
+	# self.wt = [1, -0.1, 0.1, 0.75, -0.5, 0.3, -0.1, 0.75, 0.1, -0.1, 0.3, -0.1]
+	# self.name = 'minor'
 		
 	chords_vocabulary = []
 	# Am
 	chords_vocabulary.append(chord('minor', [0, 2, 3, 5, 7, 8, 10]))
 	# Gm Maj7
 	chords_vocabulary.append(chord('minor_harmonic', [0, 2, 3, 5, 7, 8, 11]))
-	# Gm dim WARNING:  This is an OCTATONIC Scale ()
+	# Gm Maj6
+	chords_vocabulary.append(chord('minor_melodic', [0, 2, 3, 5, 7, 9, 11]))
+	# Gm dim WARNING: This is an OCTATONIC Scale
 	chords_vocabulary.append(chord('minor_diminished', [0, 2, 3, 5, 6, 8, 9, 11]))
 	# Gm b5
 	chords_vocabulary.append(chord('minor_half_diminished', [0, 2, 3, 5, 6, 8, 10]))
@@ -88,52 +122,71 @@ def build_chords_vocabulary():
 	# A7#11
 	chords_vocabulary.append(chord('dominant_sharp_11', [0, 2, 4, 6, 7, 9, 10]))
 
-	##### 
-	canonical_chord_vector = np.zeros((len(chords_vocabulary), 12), dtype=float)
+	# # # # # 
+	# initialize and compute canonical_chord_vectors
+	canonical_chord_vectors = np.zeros((len(chords_vocabulary), 12), dtype=float)
 	for i, el in enumerate(chords_vocabulary):
-		canonical_chord_vector[i][el.notes] = el.wt[el.notes]
+		canonical_chord_vectors[i][el.notes] = el.wt[el.notes]
 	
-	return chords_vocabulary, canonical_chord_vector
+	return chords_vocabulary, canonical_chord_vectors
+
 	
 	
-def find_chord(set_of_pitches):
+	
+def find_chord(set_of_notes):
 	'''
-	INPUT: set_of_pitches SET
-	OUTPUT: 
+	INPUT: set_of_notes SET
+	OUTPUT: (INT, STR) 
+			1st output variable: the index in chords_vocabulary
+	chord_type is the type of chord (e.g. 'major','dominant_sharp_11')
 	'''
 	
-	chords_vocabulary, canonical_chord_vector = build_chords_vocabulary()
+	chords_vocabulary, canonical_chord_vectors = build_chords_vocabulary()
 	
-	# N.B. set_of_pitches must be accompanied by a corresponding set_of_duration
-	set_of_notes = np.array([p%12 for p in set_of_pitches])
-	
+	# vector: a vector representation of set_of_notes. 
+	# 		  each entry is weighted with the 
+	# 		  corresponding chord weights
 	vector = np.zeros((len(chords_vocabulary), 12), dtype=float)
 	for i, el in enumerate(chords_vocabulary):
 		vector[i, set_of_notes] += el.wt[set_of_notes]
-	print vector
 	
-		
-	# now do cosine_similarity btw 'vector' & 'canonical_chord_vector'
-	cs = np.empty((len(vector), len(canonical_chord_vector)))
-	memory = {'val': 0, 'i': 0, 'j': 0}
-	for i, v1 in enumerate(vector):
-		for j, v2 in enumerate(canonical_chord_vector):
-			val = cosine_similarity(v1, v2)
-			if val > memory['val']:
-				memory['val'] = val
-				memory['i'] = i
-				memory['j'] = j
-			cs[i,j] = val
-	
-	cs = np.empty((len(vector), len(canonical_chord_vector)))
-	memory = {'val': 0, 'i': 0}
+	# compute cosine_similarity and pick the closest chord
 	for i in range(len(vector)):
-		val = cosine_similarity(vector[i], canonical_chord_vector[i])
-		if val > memory['val']:
-			memory['val'] = val
-			memory['i'] = i
-			memory['j'] = j
-		cs[i,j] = val
+		val = cosine_similarity(vector[i], canonical_chord_vectors[i])
+		if i == 0 or val > memory['val']:
+			memory = {'val': val, 'i':i}
+		print 'likeliness: {} -- {},'.format(round(val,3), chords_vocabulary[i].name)
+		
+	chord_type = chords_vocabulary[memory['i']].name
 	
+	return {'chord_type':chord_type,\
+	 		'i': memory['i'], \
+			'val': memory['val']}
+
+def find_chord_w_transpose(set_of_pitches):
+	# N.B. 'set_of_pitches' could be accompanied by a corresponding 'set_of_duration'
+
+	out = []
+	for i in range(12):
+		set_of_notes = np.array([p%12 for p in np.array(set_of_pitches) + i])
+		set_of_notes = np.array(list(set(set_of_notes)))
+		out.append(find_chord(set_of_notes))
+
+
 	
+	out.sort(key=lambda x: x['val'], reverse=True)
+	i = out[0]['i']
+	set_of_notes = np.array([p%12 for p in np.array(set_of_pitches) + i])
+	set_of_notes = np.array(list(set(set_of_notes)))
+
+	root = out[0]['i']
+	chord_typeout[0]['chord_type']
+	return chordroot,  
+
+
+
+
+
+
+
 	
