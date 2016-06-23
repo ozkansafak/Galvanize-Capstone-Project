@@ -130,26 +130,18 @@ I'll abandon this endeavor now and instead will write a script to get the note v
 
 **chords**
 ```javascript
-minor [ 0.465  0. 0.07   0.349  0.     0.14   0.     0.349  0.07   0.     0.14
-  0. ]
-minor_harmonic [ 0.465  0.     0.07   0.349  0.     0.14   0.     0.349  0.07   0.     0.  
-  0.14 ]
-minor_melodic [ 0.451  0.     0.068  0.338  0.     0.135  0.     0.338  0.     0.203  0.  
-  0.203]
-minor_diminished [ 0.465  0.     0.07   0.349  0.     0.14   0.349  0.     0.07   0.14   0.  
-  0.035]
-minor_half_diminished [ 0.465  0.     0.07   0.349  0.     0.14   0.349  0.     0.07   0.     0.14  
-  0.   ]
-major [ 0.382  0.     0.057  0.     0.286  0.114  0.     0.286  0.     0.057  0.  
-  0.114]
-major_augmented [ 0.387  0.     0.058  0.     0.291  0.     0.116  0.116  0.     0.058  0.  
-  0.116]
-dominant [ 0.384  0.     0.058  0.     0.288  0.115  0.     0.288  0.     0.058  
- -0.576  0.   ]
-dominant_altered [ 0.378  0.113  0.     0.113  0.283  0.     0.283  0.     0.113  0.     0.113  
-  0.   ]
-dominant_sharp_11 [ 0.33   0.     0.025  0.     0.247  0.     0.148  0.247  0.     0.025  
-  0.099  0.   ]
+canonical_chord_vectors
+[.46 .0  .07 .35 .0   .14 .0   .35 .07   .0    0.14  .0  ] minor
+[.46 .0  .07 .35 .0   .14 .0   .35 .07   .0    0.    .14 ] minor_harmonic
+[.45 .0  .07 .34 .0   .14 .0   .34 .0    .203  0.    .203] minor_melodic
+[.46 .0  .07 .35 .0   .14 .35  .0  .07   .14   0.    .035] minor_diminished
+[.46 .0  .07 .35 .0   .14 .35  .0  .07   .0    0.14  .0  ] minor_half_diminished
+[.38 .0  .06 .0  .29  .11 .0   .29 .0    .057  0.    .114] major
+[.38 .0  .06 .0  .29  .0  .12  .12 .0    .058  0.    .116] major_augmented
+[.38 .0  .06 .0  .29  .12 .0   .29 .0    .058 -0.576 .0  ] dominant
+[.37 .11 .0  .11 .28  .0  .29  .0  .113  .0    0.113 .0  ] dominant_altered
+[.33 .0  .03 .0  .26  .0  .15  .25 .0    .025  0.099 .0  ] dominant_sharp_11
+
 ```
 
 ---
@@ -161,8 +153,9 @@ Today's to do list:
 
 *  Run the Chord Sequencer on a MIDI file. Calculate the sequence of chords per quarter note. 
 ```
-INPUT: MIDI filename, 
-OUTPUT: [Am, GMaj aug, G7, Dm harmonic, ...] 
+def extract_chord_sequence(filename) 
+	# INPUT : filename STR, 
+	# OUTPUT: LIST of strings ['Am', 'GMaj aug', 'G7', 'Dm_harmonic', ...]
 ```
 *  Create RNN Input file for each MIDI (Lee)
 *  Implement the Cost Function term that accounts for chord-melody mismath (Lee)

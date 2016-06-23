@@ -179,7 +179,7 @@ def notes_chord_similarity(gr_notes):
 			'dist': memory['dist']}
 
 def pitches_to_notes(gr_pitches):
-	# a helper func
+# a helper func
 	'''
 	INPUT: NP.ARRAY 1-by-sth
 	OUTPUT: NP.ARRAY 1-by-sth
