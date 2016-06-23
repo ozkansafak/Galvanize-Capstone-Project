@@ -146,7 +146,7 @@ canonical_chord_vectors
 
 ---
 
-*June 22, 2016 - Wednesday*
+***June 22, 2016 - Wednesday***
 
 Working on chord-note similarity.  
 Today's to do list:
@@ -196,7 +196,11 @@ Use `os` module to take the filenames in and construct a `pitch_matrix`
 and a `chord_sequence` for all of them. Then I can `cPickle` the output and feed it as training data to RNN model. 
 * build your custom RNN model on Lasagne.
 
+![pitchmatrix](Source-Code/pitch_matrix.png)
+
+
 ---
+
 
 ***June 23, 2016 - Thursday***
 
