@@ -21,8 +21,8 @@ def plot_canonical_chords_vector():
 	ax.xaxis.tick_top()
 	ax.set_ylim([10,0])
 	
-	ax.set_xticklabels(column_labels, minor=False, fontsize=14)
-	ax.set_yticklabels(row_labels, minor=False, fontsize=14)
+	ax.set_xticklabels(column_labels, minor=False, fontsize=24)
+	ax.set_yticklabels(row_labels, minor=False, fontsize=24)
 	
 	plt.ion()
 	plt.show()
