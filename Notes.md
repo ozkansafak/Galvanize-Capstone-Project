@@ -153,7 +153,7 @@ Today's to do list:
 
 *  Run the Chord Sequencer on a MIDI file. Calculate the sequence of chords per quarter note. 
 ```
-def extract_chord_sequence(filename) 
+def extract_chord_sequence(filename):
 	# INPUT : filename STR, 
 	# OUTPUT: LIST of strings ['Am', 'GMaj aug', 'G7', 'Dm_harmonic', ...]
 ```

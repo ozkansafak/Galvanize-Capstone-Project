@@ -181,7 +181,7 @@ def notes_chord_similarity(gr_notes):
 def pitches_to_notes(gr_pitches):
 # a helper func
 	'''
-	INPUT: NP.ARRAY 1-by-sth
+	INPUT: NP.ARRAY sth-by-2
 	OUTPUT: NP.ARRAY 1-by-sth
 	
 	'''
@@ -190,6 +190,10 @@ def pitches_to_notes(gr_pitches):
 	return gr_notes
 	
 def find_chord(gr_pitches):
+	'''
+	INPUT:
+	OUTPUT: (STR, STR)
+	'''
 	# N.B. 'gr_pitches' could be accompanied by a corresponding 'gr_duration'
 
 	out = []

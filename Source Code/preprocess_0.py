@@ -58,41 +58,129 @@ def note_value(time_series_list):
 	INPUT: time_series_list LIST
 	OUTPUT: l LIST
 	l is a sorted list of all possible note values in the midi file.
+	96 ticks is a quarter note
 	'''
 	s = set() # possible note values
 	[[s.add(ts[i][0]-ts[i-1][0]) for i in range(1, len(ts))] for ts in time_series_list]
 	
 	l = list(s)
 	l.sort()
-	
-	# for i in range(1, len(l)):
-	# 	ratio = l[i]/96. # 96 ticks to a quarter note
-	# 	print 'note_values in current file: {}'.format(ratio)
-	
+		
 	return l
 
 
-def extract_slice(time_series_list, time=96*4*10, bar=96):
-	
-	dum = []
-	for time_series in time_series_list:
-		dum.append([elem for elem in time_series if elem[0] >= time])
+def extract_end_start_times(time_series_list, bar):
 
-	
-	slice =[]
-	for time_series in dum:
-		slice.append([elem for elem in time_series if elem[0] < time + bar])
+	start_time = min(time_series_list, key=lambda x: x[0])[0][0]
+	# round it down to previous quarter note
+	start_time = start_time - start_time % bar
+
+	# take the duration of the note into acct while calculating end_time
+	end_time = max([ts[-1][0] + ts[-1][2] for ts in time_series_list])
+	# round it up to next quarter note
+	end_time = end_time - end_time % bar + bar
+
+	return start_time, end_time
+
+
+
+
+def extract_slice(time_series_list, time, bar):
+	'''
+	INPUT: ..., INT, INT 
+	       ..., tick count, tick count
+	OUTPUT: LIST [(INT, INT, INT), ...] __ [(updated_time, pitch, clipped_duration), ...]
+		clips the duration of the notes
+		extract slice of all noteEvents with updated keyOn times, pitches and clipped durations
+		Definitely and O(n) operation
+	'''
+	# select all noteEvents (rows of time_series_list) 
+	# where keyOff > time
+
+	dum = []
+	for ts in time_series_list:
+		for nE in ts:
+			keyOn = nE[0]
+			keyOff = nE[0]+nE[2]
+			if keyOff > time:
+				dum.append((keyOn if keyOn > time else time ,\
+							 nE[1],\
+							 nE[2] if keyOn > time else keyOff - time\
+							))
+					
+	# select all noteEvents 
+	# where keyOn < time + bar 
+	slice = []
+	for nE in dum:
+		keyOn = nE[0]
+		keyOff = nE[0]+nE[2]
+		if keyOn < time + bar:
+			slice.append((keyOn,\
+						 nE[1],\
+						 nE[2] if keyOff < (time + bar) else (time + bar - keyOn)\
+						))
+
+	print 'slice=' , slice
 	
 	return slice
 
 
+
+
+def extract_pitches(time_series_list, time=96*4*10, bar=96):
+	'''
+	INPUT: 
+	OUTPUT: sth-by-2 NP.ARRAY(), np.array([np.array([ pitch INT, clipped_duration INT])])
+	'''
+	
+	slice = extract_slice(time_series_list, time, bar)
+	gr_pitches = np.empty((0,2), dtype=int)
+	for nE in slice:
+		gr_pitches = np.vstack((gr_pitches, np.array([nE[1], nE[2]]))) # pitch, clipped_duration
+		
+			
+	return gr_pitches[:,0]
+
+
+
+
+def extract_chord_sequence(time_series_list, bar=96):
+    # INPUT : time_series_list [(time, pitch, duration)], 
+    # OUTPUT: LIST of strings ['Am', 'GMaj aug', 'G7', 'Dm_harmonic', ...]
+	
+	start_time, end_time = extract_end_start_times(time_series_list, bar)
+	
+	time_sequence = range(start_time, end_time, bar)
+	chord_sequence = [[None, None] for i in time_sequence] 
+
+	for i, time in enumerate(time_sequence):
+		gr_pitches = extract_pitches(time_series_list, time, bar)
+		print 'extract_chord_sequence, i=', i
+		chord_sequence[i][0] = time
+		chord_sequence[i][1] = find_chord(gr_pitches)
+		
+def extract_pitch_matrix(time_series_list, bar=96):
+	start_time, end_time = extract_end_start_times(time_series_list, bar)
+
+	time_sequence = range(start_time, end_time, bar)
+	pitch_matrix = np.zeros((128, len(time_sequence)), dtype=int)
+	print 'pitch_matrix.shape', pitch_matrix.shape,'\n'
+	for i, time in enumerate(time_sequence):
+		gr_pitches = extract_pitches(time_series_list, time, bar)
+		print 'i =', i
+		for j in gr_pitches:
+			pitch_matrix[j][i] = 1
+		
+
+	return pitch_matrix
+
 if __name__ == '__main__':
-	"""
+	'''
 	INPUT: filename STR 
 	OUTPUT: time_series_list LIST [[ (time INT, pitch INT, duration INT) TUPLE, ...], ...]
 	
 	filename of MIDI file
-	"""
+	'''
 	input_MIDI = 'bwv733_io.mid'
 	tracks = midi.read_midifile(input_MIDI)
 	note_on, note_off, time_series_list = \
@@ -112,16 +200,13 @@ if __name__ == '__main__':
 	l = note_value(time_series_list)
 	# # # # # # # 
 	
-	slice = extract_slice(time_series_list)
 	
-	gr_pitches = np.empty(0, dtype=int)
-	for ts in slice:
-		for elem in ts:
-			gr_pitches = np.append(gr_pitches, elem[1])
+	# root, chord_type = find_chord(gr_pitches)
+	# print root, chord_type
 	
-	
-	root, chord_type = find_chord(gr_pitches)
-	print root, chord_type
+	# # # # # # 
+	pitch_matrix = extract_pitch_matrix(time_series_list, bar=96)
+	# chord_sequence = extract_chord_sequence(time_series_list, bar=96)
 		
 
 
