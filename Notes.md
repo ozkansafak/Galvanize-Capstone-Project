@@ -196,13 +196,22 @@ Use `os` module to take the filenames in and construct a `pitch_matrix`
 and a `chord_sequence` for all of them. Then I can `cPickle` the output and feed it as training data to RNN model. 
 * build your custom RNN model on Lasagne.
 
-![pitchmatrix](Source-Code/pitch_matrix.png)
+Here's the `pitch_matrix` for `bwv733.md`  
+![pitchmatrix](Source Code/pitch_matrix.png)  
 
+
+and here's the canonical_chords_vector  
+![canonical_chords_vector](Source Code/canonical_chord_vectors.png)
 
 ---
 
 
 ***June 23, 2016 - Thursday***
-
+Cleaning up folders in remote repo
+```bash
+git rm -r --cached some-directory
+git commit -m 'Remove the now ignored directory "some-directory"'
+git push origin master
+```
 
 
