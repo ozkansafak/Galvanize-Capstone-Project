@@ -145,7 +145,6 @@ def notes_to_vector(gr_notes, chords_vocabulary):
 		   
 	OUTPUT: N-by-12 NP.ARRAY
 	'''
-	print type(gr_notes)
 	vector = np.zeros((len(chords_vocabulary), 12), dtype=float)
 	for i, el in enumerate(chords_vocabulary):
 		vector[i, gr_notes] += el.wt[gr_notes]
@@ -162,7 +161,7 @@ def notes_chord_similarity(gr_notes):
 			1st output variable: the index in chords_vocabulary
 	chord_type is the type of chord (e.g. 'major','dominant_sharp_11')
 	'''
-	print '\n\ngr_notes =', gr_notes
+	# print '\n\ngr_notes =', gr_notes
 	chords_vocabulary, canonical_chord_vectors = build_chords_vocabulary()
 	
 	# vector: a vector representation of gr_notes. 
@@ -170,12 +169,13 @@ def notes_chord_similarity(gr_notes):
 	# 		  corresponding chord weights
 	
 	vector = notes_to_vector(gr_notes, chords_vocabulary)
+
 	# compute cosine_similarity and pick the closest chord
 	for id in range(len(vector)):
 		dist = cosine_similarity(vector[id], canonical_chord_vectors[id])
 		if id == 0 or dist > memory['dist']:
 			memory = {'dist': dist, 'chord_id': id}
-		print 'likeliness: {} -- {},'.format(round(dist,3), chords_vocabulary[id].name)
+		# print 'likeliness: {} -- {},'.format(round(dist,3), chords_vocabulary[id].name)
 		
 	chord_type = chords_vocabulary[memory['chord_id']].name
 	
@@ -212,9 +212,6 @@ def find_chord(gr_pitches):
 
 	out.sort(key=lambda x: x['dist'], reverse=True)
 	sh = out[0]['shift']
-	print 'shift = ', sh
-	print 'gr_pitches =', gr_pitches
-	# gr_notes = pitches_to_notes(gr_pitches + i)
 
 	root = D[-out[0]['shift']]
 	chord_type = out[0]['chord_type']

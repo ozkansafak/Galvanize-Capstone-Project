@@ -74,6 +74,9 @@ def extract_melody(track):
 			
 	return note_on, note_off
 
+
+
+
 def time_series_builder(note_on, note_off):
 	'''
 	INPUT: note_on LIST [(tick INT, (pitch INT, velocity INT), time INT), ...],
@@ -90,10 +93,14 @@ def time_series_builder(note_on, note_off):
 				duration = ev_off[2] - time
 				note_off.pop(i)
 				time_series.append((time, pitch, duration))
-				if duration < 0: print 'duration < 0\n\tev_on, ev_off', ev_on, ev_off
+				if duration < 0: 
+					print 'duration < 0\n\tev_on, ev_off', ev_on, ev_off
 				break
 
 	return time_series
+
+
+
 
 def note_value(time_series_list):
 	'''
@@ -109,6 +116,7 @@ def note_value(time_series_list):
 	l.sort()
 		
 	return l
+
 
 
 def extract_end_start_times(time_series_list, bar):
@@ -150,8 +158,9 @@ def extract_slice(time_series_list, time, bar):
 							 nE[2] if keyOn > time else keyOff - time\
 							))
 					
-	# select all noteEvents 
+	# intersection with all noteEvents 
 	# where keyOn < time + bar 
+	
 	slice = []
 	for nE in dum:
 		keyOn = nE[0]
@@ -161,9 +170,6 @@ def extract_slice(time_series_list, time, bar):
 						 nE[1],\
 						 nE[2] if keyOff < (time + bar) else (time + bar - keyOn)\
 						))
-
-	print 'slice=' , slice
-	
 	return slice
 
 
@@ -197,19 +203,20 @@ def extract_chord_sequence(time_series_list, bar=96):
 
 	for i, time in enumerate(time_sequence):
 		gr_pitches = extract_pitches(time_series_list, time, bar)
-		print 'extract_chord_sequence, i=', i
 		chord_sequence[i][0] = time
 		chord_sequence[i][1] = find_chord(gr_pitches)
+		print chord_sequence[i][1]
+
+	return chord_sequence
 		
 def extract_pitch_matrix(time_series_list, bar=96):
 	start_time, end_time = extract_end_start_times(time_series_list, bar)
 
 	time_sequence = range(start_time, end_time, bar)
 	pitch_matrix = np.zeros((128, len(time_sequence)), dtype=int)
-	print 'pitch_matrix.shape', pitch_matrix.shape,'\n'
+
 	for i, time in enumerate(time_sequence):
 		gr_pitches = extract_pitches(time_series_list, time, bar)
-		print 'i =', i
 		for j in gr_pitches:
 			pitch_matrix[j][i] = 1
 		
@@ -244,14 +251,12 @@ if __name__ == '__main__':
 	# # # # # # # 
 	
 	
-	# root, chord_type = find_chord(gr_pitches)
-	# print root, chord_type
 	
 	# # # # # # 
-	pitch_matrix = extract_pitch_matrix(time_series_list, bar=96)
-	plot_pitch_matrix(pitch_matrix, title='bwv733.mid pitch_matrix', xlabel = 'quarter note', ylabel='midi notes (0-127)')
-	chord_sequence = extract_chord_sequence(time_series_list, bar=96)
-		
+	# pitch_matrix = extract_pitch_matrix(time_series_list, bar=96)
+	# plot_pitch_matrix(pitch_matrix, title='bwv733.mid pitch_matrix', xlabel = 'quarter note', ylabel='midi notes (0-127)')
+	chord_sequence = extract_chord_sequence(time_series_list, bar=96*4)
+	chord_sequence
 
 
 
