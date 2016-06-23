@@ -33,9 +33,9 @@ def plot_pitch_matrix(pitch_matrix, title=None, xlabel=None, ylabel=None):
 	
 	fig, ax = plt.subplots()
 	heatmap = ax.pcolor(pitch_matrix, cmap=plt.cm.Blues)
-	plt.title(title, fontsize = 20)
-	plt.ylabel(ylabel, fontsize = 20)
-	plt.xlabel(xlabel, fontsize = 20)
+	plt.title(title, fontsize = 24)
+	plt.ylabel(ylabel, fontsize = 24)
+	plt.xlabel(xlabel, fontsize = 24)
 	ax = plt.gca()
 	ax.set_xlim([0, pitch_matrix.shape[1]])
 	ax.set_ylim([0, pitch_matrix.shape[0]])
@@ -253,10 +253,10 @@ if __name__ == '__main__':
 	
 	
 	# # # # # # 
-	# pitch_matrix = extract_pitch_matrix(time_series_list, bar=96)
-	# plot_pitch_matrix(pitch_matrix, title='bwv733.mid pitch_matrix', xlabel = 'quarter note', ylabel='midi notes (0-127)')
+	pitch_matrix = extract_pitch_matrix(time_series_list, bar=96/2)
+	# plot_pitch_matrix(pitch_matrix, title='bwv733.mid pitch_matrix', xlabel = 'quarter note increments', ylabel='midi notes (0-127)')
 	chord_sequence = extract_chord_sequence(time_series_list, bar=96*4)
-	chord_sequence
+	
 
 
 

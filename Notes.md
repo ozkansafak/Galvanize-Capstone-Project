@@ -207,11 +207,11 @@ and here's the canonical_chords_vector
 
 
 ***June 23, 2016 - Thursday***
-Cleaning up folders in remote repo
+To clean up folders in github repo remotely.
 ```bash
 git rm -r --cached some-directory
 git commit -m 'Remove the now ignored directory "some-directory"'
 git push origin master
 ```
-
+[marekrei.com Theano Tutorial](http://www.marekrei.com/blog/theano-tutorial/)
 
