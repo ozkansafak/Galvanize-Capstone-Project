@@ -1,3 +1,4 @@
+from preprocess_2 import *
 import midi
 import re
 import os
@@ -71,18 +72,18 @@ def note_value(time_series_list):
 	return l
 
 
-def predict_chord(time_series_list, time=96*4*10):
+def extract_slice(time_series_list, time=96*4*10, bar=96):
 	
 	dum = []
 	for time_series in time_series_list:
 		dum.append([elem for elem in time_series if elem[0] >= time])
 
-	bar = 96 * 4
-	slyce =[]
-	for time_series in dum:
-		slyce.append([elem for elem in time_series if elem[0] < time + bar])
 	
-	return slyce
+	slice =[]
+	for time_series in dum:
+		slice.append([elem for elem in time_series if elem[0] < time + bar])
+	
+	return slice
 
 
 if __name__ == '__main__':
@@ -111,19 +112,18 @@ if __name__ == '__main__':
 	l = note_value(time_series_list)
 	# # # # # # # 
 	
-	slyce = predict_chord(time_series_list)
+	slice = extract_slice(time_series_list)
 	
-	set_of_pitches = []
-	for ts in slyce:
+	gr_pitches = np.empty(0, dtype=int)
+	for ts in slice:
 		for elem in ts:
-			set_of_pitches.append(elem[1])
+			gr_pitches = np.append(gr_pitches, elem[1])
 	
-	from preprocess_2 import *
-	i, chord_type = find_chord_w_transpose(set_of_pitches)
-	print chord_type
+	
+	root, chord_type = find_chord(gr_pitches)
+	print root, chord_type
 		
 
-	# import preprocess_2
 
 
 

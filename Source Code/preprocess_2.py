@@ -126,62 +126,90 @@ def build_chords_vocabulary():
 	# initialize and compute canonical_chord_vectors
 	canonical_chord_vectors = np.zeros((len(chords_vocabulary), 12), dtype=float)
 	for i, el in enumerate(chords_vocabulary):
-		canonical_chord_vectors[i][el.notes] = el.wt[el.notes]
+		canonical_chord_vectors[i][el.notes] = np.round(el.wt[el.notes],3)
 	
 	return chords_vocabulary, canonical_chord_vectors
 
 	
-	
-	
-def find_chord(set_of_notes):
+
+def notes_to_vector(gr_notes, chords_vocabulary):
+	# a helper func
 	'''
-	INPUT: set_of_notes SET
+	INPUT: gr_notes: 1-by-sth NP.ARRAY with distinct ascending values in 0,..11
+		   chords_vocabulary: (12 by 1) LIST of chord objects, 
+		   
+	OUTPUT: N-by-12 NP.ARRAY
+	'''
+	print type(gr_notes)
+	vector = np.zeros((len(chords_vocabulary), 12), dtype=float)
+	for i, el in enumerate(chords_vocabulary):
+		vector[i, gr_notes] += el.wt[gr_notes]
+		# normalize just for the heck of it.
+		vector[i] = vector[i]/np.linalg.norm(vector[i])
+		
+	return vector
+	
+def notes_chord_similarity(gr_notes):
+	'''
+	INPUT: 1-by-sth NP.ARRAY with distinct ascending values in 0,..11 
 	OUTPUT: (INT, STR) 
+			gr_notes is a sorted ascending list. eg [1, 4, 6, 8]
 			1st output variable: the index in chords_vocabulary
 	chord_type is the type of chord (e.g. 'major','dominant_sharp_11')
 	'''
-	
+	print '\n\ngr_notes =', gr_notes
 	chords_vocabulary, canonical_chord_vectors = build_chords_vocabulary()
 	
-	# vector: a vector representation of set_of_notes. 
+	# vector: a vector representation of gr_notes. 
 	# 		  each entry is weighted with the 
 	# 		  corresponding chord weights
-	vector = np.zeros((len(chords_vocabulary), 12), dtype=float)
-	for i, el in enumerate(chords_vocabulary):
-		vector[i, set_of_notes] += el.wt[set_of_notes]
 	
+	vector = notes_to_vector(gr_notes, chords_vocabulary)
 	# compute cosine_similarity and pick the closest chord
-	for i in range(len(vector)):
-		val = cosine_similarity(vector[i], canonical_chord_vectors[i])
-		if i == 0 or val > memory['val']:
-			memory = {'val': val, 'i':i}
-		print 'likeliness: {} -- {},'.format(round(val,3), chords_vocabulary[i].name)
+	for id in range(len(vector)):
+		dist = cosine_similarity(vector[id], canonical_chord_vectors[id])
+		if id == 0 or dist > memory['dist']:
+			memory = {'dist': dist, 'chord_id': id}
+		print 'likeliness: {} -- {},'.format(round(dist,3), chords_vocabulary[id].name)
 		
-	chord_type = chords_vocabulary[memory['i']].name
+	chord_type = chords_vocabulary[memory['chord_id']].name
 	
-	return {'chord_type':chord_type,\
-	 		'i': memory['i'], \
-			'val': memory['val']}
+	return {'chord_type': chord_type,\
+	 		'chord_id': memory['chord_id'], \
+			'dist': memory['dist']}
 
-def find_chord_w_transpose(set_of_pitches):
-	# N.B. 'set_of_pitches' could be accompanied by a corresponding 'set_of_duration'
+def pitches_to_notes(gr_pitches):
+	# a helper func
+	'''
+	INPUT: NP.ARRAY 1-by-sth
+	OUTPUT: NP.ARRAY 1-by-sth
+	
+	'''
+	gr_notes = list(set([p%12 for p in gr_pitches]))
+	gr_notes = np.array(sorted(gr_notes))
+	return gr_notes
+	
+def find_chord(gr_pitches):
+	# N.B. 'gr_pitches' could be accompanied by a corresponding 'gr_duration'
 
 	out = []
-	for i in range(12):
-		set_of_notes = np.array([p%12 for p in np.array(set_of_pitches) + i])
-		set_of_notes = np.array(list(set(set_of_notes)))
-		out.append(find_chord(set_of_notes))
+	for sh in range(12): 
+		# transpose up by sh semitones
+		gr_notes = pitches_to_notes(gr_pitches + sh)
+		dict_ = notes_chord_similarity(gr_notes)
+		dict_['shift'] = sh
+		out.append(dict_)
 
 
-	
-	out.sort(key=lambda x: x['val'], reverse=True)
-	i = out[0]['i']
-	set_of_notes = np.array([p%12 for p in np.array(set_of_pitches) + i])
-	set_of_notes = np.array(list(set(set_of_notes)))
+	out.sort(key=lambda x: x['dist'], reverse=True)
+	sh = out[0]['shift']
+	print 'shift = ', sh
+	print 'gr_pitches =', gr_pitches
+	# gr_notes = pitches_to_notes(gr_pitches + i)
 
-	root = out[0]['i']
-	chord_typeout[0]['chord_type']
-	return chordroot,  
+	root = D[-out[0]['shift']]
+	chord_type = out[0]['chord_type']
+	return root, chord_type
 
 
 

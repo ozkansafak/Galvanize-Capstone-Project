@@ -61,7 +61,7 @@ preprocessing Stage 0 finished
 `OUTPUT: time_series LIST = [(time, pitch, duration), (...), (...)]`
 
 --- 
-**IMPORTANT FINDING**
+**IMPORTANT FINDING !!!**
 
 I have only worked with one single Bach Fugue MIDI File: bwv733.mid
 It looks like there were errors in this midi file. And there might be similar errors on other data files.
@@ -69,24 +69,25 @@ It looks like there were errors in this midi file. And there might be similar er
 at track=1: len(NoteOnEvent) = 849
             len(NoteOffEvent) = 850
 ```
-Also, my `preprocessing.py` script gave negative `duration` error. However, when I imported the midi file to **Ableton Live** and then exported it back and then ran the `preprocessing.py` on it, all the negative `duration` errors were gone!!! and the redundant NOteOff events were also gone. 
+Also, my `preprocessing.py` script gave negative `duration` error. 
+However, when I imported the midi file to **Ableton Live** and then exported it back and then ran the `preprocessing.py` on it, all the negative `duration` errors were gone!!! and the redundant NoteOff events were also gone. 
 ```
 at track=1: len(NoteOnEvent) = 849
             len(NoteOffEvent) = 849
 ```
 
-> I might need to manually import and export the midi files in and out of Ableton Live before feeding them to RNN as training set. 
+I might need to manually import and export the midi files in and out of Ableton Live before feeding them to RNN as training set. 
 
-Tomorrow: 
-- do more tests to check basic parameters. 
-- import the time_series back to MIDI 
+Tomorrow:  
+> Tests to check basic parameters.  
+> Import the time_series back to MIDI 
 
 ---
 
 *June 20, 2016 - Monday*
 
-Had a great meeting/ Brainstorming session with Kamil.
-**A crude Road Map:**
+Had a great meeting/ Brainstorming session with Kamil.  
+**A Crude Road Map:**
 ``` 
 - Stage 0: Key & Chord Sequence Prediction
 - Stage 1: INPUT: Bass line
@@ -118,29 +119,64 @@ Set up the RNN such that the melody note at `time = t` is influenced by a melody
 *June 21, 2016 - Tuesday*
 
 
-**Pipe Line**
+**Preprocess Pipe Line**
 ```
           (import)      (export) |bwv733_t1.mid| (merger)
 bwv733.mid ----> Ableton ------> |bwv733_t2.mid| -------> bwv733_io.mid
                                  |bwv733_t3.mid|
 ```
-when `bwv733.mid` is imported into and exported out of Ableton the timeSignature info in the midi file gets modified. I tried to reimport it from the oroginal `bwv733.mid` file to no avail. 
+When `bwv733.mid` is imported into and exported out of Ableton the timeSignature info in the midi file gets modified. I tried to reimport it from the original `bwv733.mid` file to no avail. 
 I'll abandon this endeavor now and instead will write a script to get the note value info based on all the tracks in the midi file. 
 
 **chords**
-```
-0 [ 1.   -0.1   0.1   0.75 -1.    0.3  -0.1   0.75  0.1  -0.1   0.3  -0.1 ] minor
-1 [ 1.   -0.1   0.1   0.75 -1.    0.3  -0.1   0.75  0.1  -0.1  -0.1   0.3 ] minor_harmonic
-2 [ 1.    0.1  -0.1   0.75 -1.   -0.1   0.75  0.1  -0.1   0.3  -0.1  -0.1 ] minor_diminished
-3 [ 1.   -0.1   0.1   0.75 -1.    0.3   0.75 -0.1   0.1  -0.1   0.3  -0.1 ] minor_half_diminished
-4 [ 1.   -0.1   0.1  -1.    0.75  0.3  -0.1   0.75 -0.1   0.1  -0.1   0.3 ] major
-5 [ 1.   -0.1   0.1  -1.    0.75 -0.1   0.3   0.75 -0.1   0.1  -0.1   0.3 ] major_augmented
-6 [ 1.   -0.1   0.1  -1.    0.75  0.3  -0.1   0.75 -0.1   0.1   0.3  -0.1 ] dominant
-7 [ 1.    0.1  -0.1   0.75  0.3  -0.1   0.75 -0.1   0.1  -0.1   0.3  -0.1 ] dominant_altered
-8 [ 1.   -0.1   0.1  -0.1   0.75 -0.1   0.3   0.75 -0.1   0.1   0.3  -0.1 ] dominant_sharp_11
+```javascript
+minor [ 0.465  0. 0.07   0.349  0.     0.14   0.     0.349  0.07   0.     0.14
+  0. ]
+minor_harmonic [ 0.465  0.     0.07   0.349  0.     0.14   0.     0.349  0.07   0.     0.  
+  0.14 ]
+minor_melodic [ 0.451  0.     0.068  0.338  0.     0.135  0.     0.338  0.     0.203  0.  
+  0.203]
+minor_diminished [ 0.465  0.     0.07   0.349  0.     0.14   0.349  0.     0.07   0.14   0.  
+  0.035]
+minor_half_diminished [ 0.465  0.     0.07   0.349  0.     0.14   0.349  0.     0.07   0.     0.14  
+  0.   ]
+major [ 0.382  0.     0.057  0.     0.286  0.114  0.     0.286  0.     0.057  0.  
+  0.114]
+major_augmented [ 0.387  0.     0.058  0.     0.291  0.     0.116  0.116  0.     0.058  0.  
+  0.116]
+dominant [ 0.384  0.     0.058  0.     0.288  0.115  0.     0.288  0.     0.058  
+ -0.576  0.   ]
+dominant_altered [ 0.378  0.113  0.     0.113  0.283  0.     0.283  0.     0.113  0.     0.113  
+  0.   ]
+dominant_sharp_11 [ 0.33   0.     0.025  0.     0.247  0.     0.148  0.247  0.     0.025  
+  0.099  0.   ]
 ```
 
+---
 
+*June 22, 2016 - Wednesday*
+
+Working on chord-note similarity.  
+Today's to do list:
+
+*  Run the Chord Sequencer on a MIDI file. Calculate the sequence of chords per quarter note. 
+```
+INPUT: MIDI filename, 
+OUTPUT: [Am, GMaj aug, G7, Dm harmonic, ...] 
+```
+*  Create RNN Input file for each MIDI (Lee)
+*  Implement the Cost Function term that accounts for chord-melody mismath (Lee)
+
+```python
+# group of pitches. This is in Cm [0,3,7,10] transposed up 3 semitones.
+In [5]: gr_pitches = np.array([7+12+3, 10+24+3, 7+24+3, 0+12+3, 3+24+3, 3+24+3, 0+36+3])
+
+In [6]: gr_notes = pitches_to_notes(gr_pitches); gr_notes
+Out[6]: array([ 1,  3,  6, 10])
+
+In [7]: find_chord(gr_pitches)
+Out[7]: ('D#', 'minor')
+```
 
 
 
