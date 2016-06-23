@@ -196,7 +196,7 @@ Use `os` module to take the filenames in and construct a `pitch_matrix`
 and a `chord_sequence` for all of them. Then I can `cPickle` the output and feed it as training data to RNN model. 
 * build your custom RNN model on Lasagne.
 
-![pitchmatrix](Source-Code/pitch_matrix.png)
+![pitchmatrix](Source Code/pitch_matrix.png)
 
 
 ---
