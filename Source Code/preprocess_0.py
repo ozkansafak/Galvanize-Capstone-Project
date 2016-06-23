@@ -2,10 +2,52 @@ from preprocess_2 import *
 import midi
 import re
 import os
+import matplotlib.pylab as plt
 
 """	Stage 0: MIDI to time_series_list conversion
 """
+def plot_canonical_chords_vector():
+	v, c = build_chords_vocabulary()
+ 	column_labels = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
+	row_labels = [i.name for i in v]
+	fig, ax = plt.subplots()
+	heatmap = ax.pcolor(c, cmap=plt.cm.Blues)
+	
+	# put the major ticks at the middle of each cell
+	ax.set_xticks(np.arange(c.shape[1])+0.5, minor=False)
+	ax.set_yticks(np.arange(c.shape[0])+0.5, minor=False)
+	
+	ax.invert_yaxis()
+	ax.xaxis.tick_top()
+	ax.set_ylim([10,0])
+	
+	ax.set_xticklabels(column_labels, minor=False, fontsize=14)
+	ax.set_yticklabels(row_labels, minor=False, fontsize=14)
+	
+	plt.ion()
+	plt.show()
+	
 
+
+def plot_pitch_matrix(pitch_matrix, title=None, xlabel=None, ylabel=None):
+	
+	fig, ax = plt.subplots()
+	heatmap = ax.pcolor(pitch_matrix, cmap=plt.cm.Blues)
+	plt.title(title, fontsize = 20)
+	plt.ylabel(ylabel, fontsize = 20)
+	plt.xlabel(xlabel, fontsize = 20)
+	ax = plt.gca()
+	ax.set_xlim([0, pitch_matrix.shape[1]])
+	ax.set_ylim([0, pitch_matrix.shape[0]])
+	
+	
+	plt.ion()
+	plt.show()
+	
+	
+	
+	
+	
 def extract_melody(track):
 	'''
 	INPUT: 	track MIDI.TRACK([]) OBJECT
@@ -174,6 +216,7 @@ def extract_pitch_matrix(time_series_list, bar=96):
 
 	return pitch_matrix
 
+
 if __name__ == '__main__':
 	'''
 	INPUT: filename STR 
@@ -206,7 +249,8 @@ if __name__ == '__main__':
 	
 	# # # # # # 
 	pitch_matrix = extract_pitch_matrix(time_series_list, bar=96)
-	# chord_sequence = extract_chord_sequence(time_series_list, bar=96)
+	plot_pitch_matrix(pitch_matrix, title='bwv733.mid pitch_matrix', xlabel = 'quarter note', ylabel='midi notes (0-127)')
+	chord_sequence = extract_chord_sequence(time_series_list, bar=96)
 		
 
 

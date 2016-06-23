@@ -57,12 +57,14 @@ def build_chords_vocabulary():
 			#               * reward color tones
 			if self.name[0:5] == 'minor':
 				self.wt[4] = -10*e # punish wrong 3rd
+			 	if (self.name != 'minor_harmonic') or (self.name != 'minor_melodic'):
+					self.wt[11] = -10*e # punish wrong 7th
 			elif self.name[0:5] == 'major':
 				self.wt[3] = -10*e # punish wrong 3rd
 				self.wt[10] = -10*e # punish wrong 7th
 			elif self.name == 'dominant':
-				self.wt[3] = -10*e # minor 3rd
-				self.wt[10] = -10*e # punish wrong 7th
+				self.wt[3] = -10*e # punish wrong 3rd
+				self.wt[11] = -10*e # punish wrong 7th
 			elif self.name == 'dominant_altered': 
 				# [0, 1, 3, 4, 6, 8, 10]
 				self.wt[5] = -10*e # punish 4th
@@ -81,8 +83,9 @@ def build_chords_vocabulary():
 				self.wt[lst[1]] -= e/2 # subtract back what you added
 				self.wt[lst[5]] -= e/2
 				
-			if self.name == 'minor_diminished':
-				self.wt[11] += e
+			# [0, 2, 3, 5, 6, 8, 9, 11]
+			# if self.name == 'minor_diminished':
+				# self.wt[11] += e
 			if self.name =='minor_harmonic':
 				self.wt[11] = 2*e
 			if self.name =='major_augmented':
@@ -103,12 +106,14 @@ def build_chords_vocabulary():
 	chords_vocabulary = []
 	# Am
 	chords_vocabulary.append(chord('minor', [0, 2, 3, 5, 7, 8, 10]))
+	# Am phrygian 
+	chords_vocabulary.append(chord('minor_phrygian', [0, 1, 3, 5, 7, 8, 10]))
 	# Gm Maj7
 	chords_vocabulary.append(chord('minor_harmonic', [0, 2, 3, 5, 7, 8, 11]))
 	# Gm Maj6
 	chords_vocabulary.append(chord('minor_melodic', [0, 2, 3, 5, 7, 9, 11]))
 	# Gm dim WARNING: This is an OCTATONIC Scale
-	chords_vocabulary.append(chord('minor_diminished', [0, 2, 3, 5, 6, 8, 9, 11]))
+	chords_vocabulary.append(chord('minor_diminished', [0, 2, 3, 5, 6, 8, 9]))#, 11]))
 	# Gm b5
 	chords_vocabulary.append(chord('minor_half_diminished', [0, 2, 3, 5, 6, 8, 10]))
 	# GMaj
