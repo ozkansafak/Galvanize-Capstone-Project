@@ -1,4 +1,4 @@
-*June 19, 2016 - Sunday*
+***June 19, 2016 - Sunday***
 
 Believe it or not, I accidentally ran `rm -rf /*` on my computer when i wanted to type  `rm -rf ./*`!!!.
 
@@ -84,7 +84,7 @@ Tomorrow:
 
 ---
 
-*June 20, 2016 - Monday*
+***June 20, 2016 - Monday***
 
 Had a great meeting/ Brainstorming session with Kamil.  
 **A Crude Road Map:**
@@ -116,7 +116,7 @@ Set up the RNN such that the melody note at `time = t` is influenced by a melody
 
 ---
 
-*June 21, 2016 - Tuesday*
+***June 21, 2016 - Tuesday***
 
 
 **Preprocess Pipe Line**
@@ -171,6 +171,34 @@ In [7]: find_chord(gr_pitches)
 Out[7]: ('D#', 'minor')
 ```
 
+---
+
+`pitch_matrix` is sucessfully constructed on **quarter notes**
+
+
+*12:10 AM Bart, sitting on the ground against the wall*
+
+I was able to run the code that builds 
+`chord_sequence`. The chords are not looking so bad, either. 
+Thus far, I made it only for `bwv733.md`. 
+
+Note: When I have time I will think of a better way to construct 
+`canonical_chord_vectors`. I'm lacking a foolproof consistency across 
+the vocab of chords. The Root, 3rd, 5th and 7th should all have same 
+weights across the board including `dominant altered` and
+`minor harmonic octatonic scale`. Then, I have to find a way
+to deal with color tones for the more complicated chord. It's doable. Only not my top priority righ now.
+
+Tomorrow:  
+
+* Time to go thru all `bwv*.mid` files to prepare the training data. 
+Use `os` module to take the filenames in and construct a `pitch_matrix` 
+and a `chord_sequence` for all of them. Then I can `cPickle` the output and feed it as training data to RNN model. 
+* build your custom RNN model on Lasagne.
+
+---
+
+***June 23, 2016 - Thursday***
 
 
 
