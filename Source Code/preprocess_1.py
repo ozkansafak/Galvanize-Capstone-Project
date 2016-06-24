@@ -4,7 +4,7 @@ import os
 """	Stage 1: MIDI to time_series conversion
 """
 
-def build_single_pattern(source, pattern):
+def build_MIDI_pattern(source, pattern):
 	'''
 	INPUT: track and pattern
 	OUTPUT: pattern
@@ -21,36 +21,63 @@ def build_single_pattern(source, pattern):
 
 	return pattern
 	
-def merger_t1s(filename='bwv733.mid'):
+def merge_tracks_one_file(rootfilename):
 	'''
-	INPUT: rootfilename STR (eg 'bwv733.mid')
+	INPUT: rootfilename STR (eg 'bwv733')
 	
-		   merges the tracks found under, for instance,
-		   'bwv733_t1.mid', 'bwv733_t2.mid' .. etc
-		   into 'bwv733_io.mid'
+			N.B. The Ableton exported tracks
+			'bwv733_t1.mid', 'bwv733_t2.mid', 'bwv733_t3.mid'
+			have to created and existing in the same folder
+			prior to running merge_tracks('bwv733.mid').
+			
+			merges the tracks found under, for instance,
+			'bwv733_t1.mid', 'bwv733_t2.mid' .. etc
+			into 'bwv733_io.mid'
+			
+	OUTPUT: None
+			The rootfilename_io.mid is generated in the same folder.
 	'''
-	print 'Input filename: {}'.format(filename)
-	rootfilename = filename[:-4]
 	
-	ls = os.listdir('.')
+	print 'Input rootfilename: {}'.format(rootfilename)
+	
+	dir = os.listdir('.')
 	lst = []
-	for ifile in ls:
-		if (ifile[0:len(rootfilename)] == rootfilename) and (len(ifile) > len(rootfilename)+4):
-			lst.append(ifile)
-			print '\tAbleton-exported files found: {}'.format(ifile)
+	for f in dir:
+		if (f[0:len(rootfilename)+2] == ''.join([rootfilename, '_t'])) and (f[-4:] == '.mid'):
+			lst.append(f)
+			print '\t Ableton-exported files found: {}'.format(f)
 	# for example, lst = ['bwv733_t1.mid', 'bwv733_t2.mid', 'bwv733_t3.mid']
 	
 	# initialize pattern object
 	pattern = midi.Pattern()
 	for item in lst:
 		source = midi.read_midifile(item)
-		pattern = build_single_pattern(source, pattern)
+		pattern = build_MIDI_pattern(source, pattern)
 		
 	# write pattern to file
 	output_file = rootfilename + '_io.mid'
 	midi.write_midifile(output_file, pattern)
+	under = '-' * len(output_file)
+	print '\t                               ' + under
 	
-	print 'Output file created: {}'.format(output_file)
+	print 'Output file created by merge_tracks(): {}\n'.format(output_file)
+
+def main_merge_tracks():
+	'''
+	merges all corresponding '[filename]t1.mid' files found in the same directory.
+	into  '[filename]_io.mid'
+	'''
+	dir = os.listdir('.')
+	t_files = []
+	for f in dir:
+		if (f[-4:] == '.mid') and (f[-7:-5] == '_t'):
+			t_files.append(f)
+	t_files = list(set(t_files))
+	
+	for f in t_files:
+		rootfilename = f[:-7]
+		merge_tracks_one_file(rootfilename)
+
 
 '''===========================================================================
 ==============================================================================
@@ -61,6 +88,8 @@ def time_series_to_MIDI_track(time_series):
 	'''
 	INPUT: time_series LIST [(time, pitch, duration), ...]
 	OUTPUT: track midi.Track()
+	
+	This is going to be used to convert RNN generated fugues back to MIDI
 	'''
 	track = midi.Track()
 	
@@ -89,16 +118,8 @@ def time_series_to_MIDI_track(time_series):
 	return track
 
 if __name__=='__main__':
-	# Instantiate a MIDI Pattern (contains a list of tracks)
-	pattern = midi.Pattern()
-	for time_series in time_series_list:
-		track = time_series_to_MIDI_track(time_series)
-		# append to pattern
-		pattern.append(track)
+	main_merge_tracks()
 
-	
-	print pattern
-	midi.write_midifile("track.mid", pattern)
 
 
 

@@ -1,4 +1,4 @@
-***June 19, 2016 - Sunday***
+***June 19, 2016 - Sunday***  
 
 Believe it or not, I accidentally ran `rm -rf /*` on my computer when i wanted to type  `rm -rf ./*`!!!.
 
@@ -14,19 +14,16 @@ git push
 ---
 **Python MIDI**
 
-https://github.com/vishnubob/python-midi
+[python MIDI github.com/vishnubob](https://github.com/vishnubob/python-midi)  
+Python, for all its amazing ability out of the box, 
+does not provide you with an easy means to manipulate
+MIDI data. There are probably about ten different python 
+packages out there that accomplish some part of this goal, 
+but there is nothing that is totally comprehensive.
 
-Python, for all its amazing ability out of the box, does not provide you with an easy means to manipulate MIDI data. There are probably about ten different python packages out there that accomplish some part of this goal, but there is nothing that is totally comprehensive.
+[markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 
----
-**md file cheatsheet**
-
-https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
-
----
-**Andrej Karpathy RNN library**
-
-https://github.com/karpathy/char-rnn
+[Andrej Karpathy github.com](https://github.com/karpathy/char-rnn)
 
 ---
 **MIDI PYTHON**

@@ -105,27 +105,27 @@ def build_chords_vocabulary():
 		
 	chords_vocabulary = []
 	# Am
-	chords_vocabulary.append(chord('minor', [0, 2, 3, 5, 7, 8, 10]))
+	chords_vocabulary.append(chord('m', [0, 2, 3, 5, 7, 8, 10]))
 	# Am phrygian 
-	chords_vocabulary.append(chord('minor_phrygian', [0, 1, 3, 5, 7, 8, 10]))
+	chords_vocabulary.append(chord('m phrygian', [0, 1, 3, 5, 7, 8, 10]))
 	# Gm Maj7
-	chords_vocabulary.append(chord('minor_harmonic', [0, 2, 3, 5, 7, 8, 11]))
+	chords_vocabulary.append(chord('m M7', [0, 2, 3, 5, 7, 8, 11]))
 	# Gm Maj6
-	chords_vocabulary.append(chord('minor_melodic', [0, 2, 3, 5, 7, 9, 11]))
+	chords_vocabulary.append(chord('m M6', [0, 2, 3, 5, 7, 9, 11]))
 	# Gm dim WARNING: This is an OCTATONIC Scale
-	chords_vocabulary.append(chord('minor_diminished', [0, 2, 3, 5, 6, 8, 9]))#, 11]))
+	chords_vocabulary.append(chord('m dim', [0, 2, 3, 5, 6, 8, 9]))#, 11]))
 	# Gm b5
-	chords_vocabulary.append(chord('minor_half_diminished', [0, 2, 3, 5, 6, 8, 10]))
+	chords_vocabulary.append(chord('m b5', [0, 2, 3, 5, 6, 8, 10]))
 	# GMaj
-	chords_vocabulary.append(chord('major', [0, 2, 4, 5, 7, 9, 11]))
+	chords_vocabulary.append(chord('', [0, 2, 4, 5, 7, 9, 11]))
 	# AMaj aug
-	chords_vocabulary.append(chord('major_augmented', [0, 2, 4, 6, 7, 9, 11]))
+	chords_vocabulary.append(chord(' aug.', [0, 2, 4, 6, 7, 9, 11]))
 	# G7
-	chords_vocabulary.append(chord('dominant', [0, 2, 4, 5, 7, 9, 10]))
+	chords_vocabulary.append(chord('7', [0, 2, 4, 5, 7, 9, 10]))
 	# A7#9, A7b9, A7b13
-	chords_vocabulary.append(chord('dominant_altered', [0, 1, 3, 4, 6, 8, 10]))
+	chords_vocabulary.append(chord('7_altered', [0, 1, 3, 4, 6, 8, 10]))
 	# A7#11
-	chords_vocabulary.append(chord('dominant_sharp_11', [0, 2, 4, 6, 7, 9, 10]))
+	chords_vocabulary.append(chord('7#11', [0, 2, 4, 6, 7, 9, 10]))
 
 	# # # # # 
 	# initialize and compute canonical_chord_vectors

@@ -19,7 +19,7 @@ def build_rnn(sequence_length=8, num_units=512):
 	
 	# input layer
 	# generate the data to pass into this
-	
+
 	l_in = InputLayer(shape=(None, sequence_length, 128))	
 	# LSTM Layer
 	l_LSTM = LSTMLayer(l_in, num_units=num_units, grad_clipping=100, only_return_final=True)

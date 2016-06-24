@@ -1,4 +1,5 @@
 from preprocess_2 import *
+from preprocess_1 import *
 import midi
 import re
 import os
@@ -31,7 +32,7 @@ def plot_canonical_chords_vector():
 
 def plot_pitch_matrix(pitch_matrix, title=None, xlabel=None, ylabel=None):
 	
-	fig, ax = plt.subplots()
+	fig, ax = plt.subplots(figsize=(21,8))
 	heatmap = ax.pcolor(pitch_matrix, cmap=plt.cm.Blues)
 	plt.title(title, fontsize = 24)
 	plt.ylabel(ylabel, fontsize = 24)
@@ -82,6 +83,8 @@ def time_series_builder(note_on, note_off):
 	INPUT: note_on LIST [(tick INT, (pitch INT, velocity INT), time INT), ...],
 	 	   note_off LIST [(tick INT, (pitch INT, velocity INT), time INT), ...],
 	OUTPUT: time_series LIST [(time INT, pitch INT, duration INT)]
+	
+	* output is time-sorted
 	'''
 	time_series = []
 	ind = 0 # index at note_off
@@ -97,23 +100,53 @@ def time_series_builder(note_on, note_off):
 					print 'duration < 0\n\tev_on, ev_off', ev_on, ev_off
 				break
 
+
 	return time_series
 
-
+def time_series_list_builder(filename_io_mid):
+	'''
+	INPUT: STR : The name of MIDI file 'bwv733_io.mid' extracted out of Ableton into typically 3 separate
+	 			MIDI files 'bwv733_t1.mid', 'bwv733_t2.mid', 'bwv733_t3.mid' 
+				and merged with merger_t1s('bwv733.mid') 
+	
+	OUTPUT: time_series LIST [(time INT, pitch INT, duration INT), ...]: time-sorted
+	
+	
+	'''
+	tracks = midi.read_midifile(filename_io_mid)
+	
+	note_on = [0 for i in tracks]
+	note_off = [0 for i in tracks]
+	time_series_list = []
+	
+	for i, track in enumerate(tracks):
+		note_on[i], note_off[i] = extract_melody(track)
+		if len(note_on[i]) != len(note_off[i]):
+			print '''len(note_on)={} and len(note_off)={} @track={}'''\
+			.format(len(note_on[i]), len(note_off[i]), i)
+		
+		out = time_series_builder(note_on[i], note_off[i])
+		if len (out) > 0:
+			time_series_list.append(out)
+	
+	return time_series_list
 
 
 def note_value(time_series_list):
 	'''
 	INPUT: time_series_list LIST
 	OUTPUT: l LIST
-	l is a sorted list of all possible note values in the midi file.
+	a sorted list of all note values in the midi file.
 	96 ticks is a quarter note
 	'''
+	
+	# Should be recalculated based on the rounded off durations.
 	s = set() # possible note values
-	[[s.add(ts[i][0]-ts[i-1][0]) for i in range(1, len(ts))] for ts in time_series_list]
+	[[s.add(ts[i+1][0] - ts[i][0]) for i in range(len(ts)-1)] for ts in time_series_list]
 	
 	l = list(s)
 	l.sort()
+	if l[0] == 0: l.pop(0)
 		
 	return l
 
@@ -205,7 +238,7 @@ def extract_chord_sequence(time_series_list, bar=96):
 		gr_pitches = extract_pitches(time_series_list, time, bar)
 		chord_sequence[i][0] = time
 		chord_sequence[i][1] = find_chord(gr_pitches)
-		print chord_sequence[i][1]
+		print ''.join(chord_sequence[i][1])
 
 	return chord_sequence
 		
@@ -224,6 +257,25 @@ def extract_pitch_matrix(time_series_list, bar=96):
 	return pitch_matrix
 
 
+
+
+def main_pitch_matrix_generator():
+	'''
+	Generates the pitch_matrices for 
+	
+	'''
+	
+	dir = os.listdir('.')
+	io_files = []
+	for f in dir:
+	    if f[-7:] == '_io.mid':
+			# all io.mid files
+			io_files.append(f)
+
+
+
+
+
 if __name__ == '__main__':
 	'''
 	INPUT: filename STR 
@@ -231,32 +283,27 @@ if __name__ == '__main__':
 	
 	filename of MIDI file
 	'''
-	input_MIDI = 'bwv733_io.mid'
-	tracks = midi.read_midifile(input_MIDI)
-	note_on, note_off, time_series_list = \
-			[0 for i in tracks], [0 for i in tracks], []
 	
-	for i, track in enumerate(tracks):
-		note_on[i], note_off[i] = extract_melody(track)
-		if len(note_on[i]) != len(note_off[i]):
-			print '''len(note_on)={} and len(note_off)={} @track={}'''\
-			.format(len(note_on[i]),len(note_off[i]),i)
-		
-		out = time_series_builder(note_on[i], note_off[i])
-		if len (out) > 0:
-			time_series_list.append(out)
-
-	# # # # # # # 
-	l = note_value(time_series_list)
-	# # # # # # # 
+	rootfilename = 'bwv851'
+	
+	#merge_tracks(rootfilename)
+	#time_series_list = time_series_list_builder(rootfilename + '_io.mid')
+	
+	#l = note_value(time_series_list)
+	#if l[0] < 48:
+	#	print '16th note detected in {}'.format(rootfilename)
 	
 	
 	
-	# # # # # # 
+	
 	pitch_matrix = extract_pitch_matrix(time_series_list, bar=96/2)
-	# plot_pitch_matrix(pitch_matrix, title='bwv733.mid pitch_matrix', xlabel = 'quarter note increments', ylabel='midi notes (0-127)')
-	chord_sequence = extract_chord_sequence(time_series_list, bar=96*4)
+	plot_pitch_matrix(pitch_matrix, title='bwv733.mid pitch_matrix', xlabel = 'quarter note increments', ylabel='midi notes (0-127)')
+	# chord_sequence = extract_chord_sequence(time_series_list, bar=96*4)
 	
+	
+
+
+
 
 
 
