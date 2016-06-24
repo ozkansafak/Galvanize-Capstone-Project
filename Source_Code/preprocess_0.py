@@ -154,7 +154,7 @@ def note_value(time_series_list):
 	# l.sort()
 	# if l[0] == 0: l.pop(0)
 	
-	l = [(k,v) for k,v in d.iteritems()]
+	l = [(k,v) for k,v in d.iteritems() if k != 0]
 	l.sort()
 	
 	return l
@@ -266,7 +266,7 @@ def extract_pitch_matrix(time_series_list, bar=96):
 	return pitch_matrix
 
 
-def retrieve_all_io_files(dirname='../MIDI data/io_files/io_files/'):
+def retrieve_all_io_files(dirname='../MIDI_data/io_files/io_files/'):
 	dir = os.listdir(dirname)
 	io_files = []
 	for f in dir:
@@ -298,16 +298,22 @@ if __name__ == '__main__':
 	'''
 	
 	for f in retrieve_all_io_files():
-		time_series_list = time_series_list_builder('../MIDI data/io_files/io_files/' + f)
+		time_series_list = time_series_list_builder('../MIDI_data/io_files/io_files/' + f)
 		
 		
-	
-		print '\n', f[:-7]
 		l = note_value(time_series_list)
-		print 'ticks\t  count'
-		for k, v in l:
-			print k, '\t:' , v
 
+		# compute ratio of all quarter and shorter notes played 
+		no_of_notes_played = reduce(lambda x, y: x+y, [e[1] for e in l])
+		no_of_quarter_and_shorter_notes_played = \
+		reduce(lambda x, y: x+y, [e[1] for e in l if ((e[0] <= 96) and (e[0]%12 == 0))])
+		ratio_96 = float(no_of_quarter_and_shorter_notes_played) / no_of_notes_played
+
+		print '', f[:-7], '--', ratio_96
+		# print 'ticks\t  count'
+		# for k, v in l:
+		# 	print k, '\t:' , v
+		
 	
 	
 	

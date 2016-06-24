@@ -214,7 +214,7 @@ git push origin master
 - Some files have 3/4 time signature. Better just take them out of the training set
 - Some files have two movements in the same file.  
 
-I'm having anxiety about Lee's idea of using a naive pitch matrix as training data.
+I'm having serious anxiety about Lee's idea of using a naive pitch matrix as training data.
 
 ---
 
@@ -224,7 +224,7 @@ I'm having anxiety about Lee's idea of using a naive pitch matrix as training da
 - Find key of the fugue by pitch counter.
 - Double check the minor diminished scale.
 - Define a cosine cost function. 
-`(np.arccos(cosine_similarity)/(2*pi)))`
+`(np.arccos(cosine_similarity(x,y))/(2*pi)))`
 - Incorporate **note duration** in extract_chord(). 
 Only consider notes that have low pitch and large duration.
 
