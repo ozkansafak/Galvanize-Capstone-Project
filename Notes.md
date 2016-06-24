@@ -202,7 +202,6 @@ and here's the canonical_chords_vector
 
 ---
 
-
 ***June 23, 2016 - Thursday***
 To clean up folders in github repo remotely.
 ```bash
@@ -211,4 +210,31 @@ git commit -m 'Remove the now ignored directory "some-directory"'
 git push origin master
 ```
 [marekrei.com Theano Tutorial](http://www.marekrei.com/blog/theano-tutorial/)
+
+- Some files have 3/4 time signature. Better just take them out of the training set
+- Some files have two movements in the same file.  
+
+I'm having serious anxiety about Lee's idea of using a naive pitch matrix as training data.
+
+---
+
+***June 24, 2016 - Friday***
+
+- Look for the pitchwise span of each fugue. Then cut down your feature set accordingly
+- Find key of the fugue by pitch counter.
+- Double check the minor diminished scale.
+- Define a cosine cost function. 
+`(np.arccos(cosine_similarity)/(2*pi)))`
+- Incorporate **note duration** in extract_chord(). 
+Only consider notes that have low pitch and large duration.
+
+
+
+
+
+
+
+
+
+
 
