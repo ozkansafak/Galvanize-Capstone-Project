@@ -6,11 +6,6 @@ from lasagne.layers import InputLayer, RecurrentLayer, LSTMLayer, DenseLayer
 from lasagne.nonlinearities import softmax
 from lasagne.objectives import binary_crossentropy, aggregate
 
-
-
-
-
-
 def build_rnn(sequence_length=8, num_units=512):
 	'''
 	INPUT:
@@ -28,8 +23,6 @@ def build_rnn(sequence_length=8, num_units=512):
 
 	return l_out
 
-
-
 def total_cost(predictions, target):
 	note_cost = binary_crossentropy(predictions, target).mean()
 	note_predictions = predictions[predictions > .5]
@@ -40,14 +33,11 @@ def total_cost(predictions, target):
 	
 	return note_cost + chord_cost
 
-
-
 def build_trainer(l_out):
 	'''
 	INPUT:
 	OUTPUT: 
-	'''
-	
+	'''	
 	output = lasagne.layers.get_output(l_out)
 	target = T.ivector('target_output')
 	
@@ -56,9 +46,3 @@ def build_trainer(l_out):
 
 	# Will use nolearn
 	
-	
-
-
-
-
-

@@ -220,11 +220,12 @@ I'm having a block accepting the idea of running the model with a sole naive pit
 
 ***June 24, 2016 - Friday***
 
-- Look for the pitchwise span of each fugue. Then cut down your feature set accordingly
 - Find key of the fugue by pitch counter.
+- Look for the pitchwise span of each fugue. 
+Then cut down your feature set accordingly
 - Double check the minor diminished scale.
 - Define a cosine cost function. 
-`(np.arccos(cosine_similarity)/(2*pi)))`
+`(np.arccos(cosine_similarity)/(pi)))`
 - Incorporate **note duration** in extract_chord(). 
 Only consider notes that have low pitch and large duration.
 

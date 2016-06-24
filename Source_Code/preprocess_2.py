@@ -27,7 +27,6 @@ def build_chords_vocabulary():
 	OUTPUT: chords_vocabulary (12 by 1) LIST of chord objects, 
 			canonical_chord_vectors (n by 12) NP.ARRAY of 
 			vector representation of chords 
-	
 	'''
 
 	class chord(object):
@@ -156,7 +155,7 @@ def notes_to_vector(gr_notes, chords_vocabulary):
 	
 	
 	
-def notes_chord_similarity(gr_notes):
+def predict_chord_type(gr_notes):
 	'''
 	INPUT: 1-by-sth NP.ARRAY with distinct ascending values in 0,..11 
 	OUTPUT: (INT, STR) 
@@ -175,10 +174,12 @@ def notes_chord_similarity(gr_notes):
 
 	# compute cosine_similarity and pick the closest chord
 	for id in range(len(vector)):
-		dist = cosine_similarity(vector[id], canonical_chord_vectors[id])
-		if id == 0 or dist > memory['dist']:
+		# arccos(cos_sim(x,y)) maps (-1) to (pi) and (1) to (0)
+		sim = cosine_similarity(vector[id], canonical_chord_vectors[id])
+		dist = np.arccos(sim) / np.pi * 180 # unit in angle
+		if id == 0 or dist < memory['dist']: # keep the smallest distance and according id.
 			memory = {'dist': dist, 'chord_id': id}
-		# print 'likeliness: {} -- {},'.format(round(dist,3), chords_vocabulary[id].name)
+		print 'distance: {} -- {},'.format(round(dist,3), chords_vocabulary[id].name)
 		
 	chord_type = chords_vocabulary[memory['chord_id']].name
 	
@@ -190,7 +191,7 @@ def notes_chord_similarity(gr_notes):
 
 
 def pitches_to_notes(gr_pitches):
-# a helper func
+	# a helper func
 	'''
 	INPUT: NP.ARRAY sth-by-2
 	OUTPUT: NP.ARRAY 1-by-sth
@@ -205,7 +206,7 @@ def pitches_to_notes(gr_pitches):
 	
 def find_chord(gr_pitches):
 	'''
-	INPUT:
+	INPUT: NDARRAY
 	OUTPUT: (STR, STR)
 	'''
 	# N.B. 'gr_pitches' could be accompanied by a corresponding 'gr_duration'
@@ -214,13 +215,13 @@ def find_chord(gr_pitches):
 	for sh in range(12): 
 		# transpose up by sh semitones
 		gr_notes = pitches_to_notes(gr_pitches + sh)
-		dict_ = notes_chord_similarity(gr_notes)
+		dict_ = predict_chord_type(gr_notes)
 		dict_['shift'] = sh
 		out.append(dict_)
 
 
-	out.sort(key=lambda x: x['dist'], reverse=True)
-	sh = out[0]['shift']
+	out.sort(key=lambda x: x['dist'], reverse=False) # reverse=False: ascending order
+	sh = out[0]['shift'] # smallest distance
 
 	root = D[-out[0]['shift']]
 	chord_type = out[0]['chord_type']
