@@ -401,8 +401,6 @@ if __name__ == '__main__':
 		# 	if k <= 96*8:
 		# 		print ' ', k, '\t:' , v
 		
-		
-	
 	
 	
 	if False: 

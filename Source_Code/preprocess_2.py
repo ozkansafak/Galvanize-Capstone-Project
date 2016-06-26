@@ -194,7 +194,7 @@ def get_chord_of_target(target):
 	
 	# most_similiar_chord_across_all_roots.shape = (12,)
 	# indices.shape = (12,)
-	# chord_similarity.shape = (12, 11)
+	# chord_similarity.shape = (12, 11) 
 	# for each root (C, C#, D ..,B) the closest chord type 
 	most_similiar_chord_across_all_roots = chord_similarity.max(axis=1)
 	indices = chord_similarity.argmax(axis=1)

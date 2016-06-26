@@ -31,7 +31,7 @@ def total_cost(predictions, target):
 	note_cost = binary_crossentropy(predictions, target).mean()
 	note_predictions = predictions[predictions > .5]
 	
-	chord_target = get_chord(pitches_to_notes(target))
+	chord_target = get_chord(pitches_to_notes(target)) 
 	
 	chord_predictions = get_chord(note_predictions)
 	chord_cost = cosine_distance(chord_predictions, chord_target)
