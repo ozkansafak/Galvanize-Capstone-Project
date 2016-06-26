@@ -371,20 +371,21 @@ if __name__ == '__main__':
 	print '{}          , {}\n'.format(lowest_pitch, highest_pitch)
 	
 	dirname = '../MIDI_data/io_files/io_files/4_4_fugues/'
-	for shift in range(0):#,12):
+	for sh in range(0):#,12):
 
 		pitch_matrix = []
 		for f_no, f in enumerate(retrieve_all_io_files(dirname)): 
-			print '\nshifting up {}, f_no {}'.format(f_no, shift)
+			print '\nshifting up {}, f_no {}'.format(f_no, sh)
 			time_series_list = time_series_list_builder(dirname + f)
-			if shift > 0:
+			if sh > 0:
 				time_series_list = transpose_up_1_fret(time_series_list)
 			p = extract_pitch_matrix(time_series_list, bar=bar)[lowest_pitch:highest_pitch+1, :]
 			pitch_matrix.append(p)
 
-		#pickle.dump(pitch_matrix, open('pitch_matrix_'+str(bar)+'ticks_sh'+str(shift)+'.p', 'wb'))
-		#print 'save: pitch_matrix_'+str(bar)+'ticks_sh'+str(shift)+'.p\n'
-		
+		#pickle.dump(pitch_matrix, open('pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p', 'wb'))
+		#print 'save: pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p\n'
+		# # pitch_matrix = pickle.load(open('training_data/pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p', 'rb'))
+
 		
 		# l = note_value(time_series_list)
 		# compute ratio of all quarter and shorter notes played 
@@ -415,8 +416,6 @@ if __name__ == '__main__':
 					ylabel='midi notes: {}-{}'.format(lowest_pitch, highest_pitch))
 				plt.savefig('{}--{}'.format(f[i][:-7],'pitch_matrix.png'))
 		
-	# to dump pickle run: pickle.dump(pitch_matrix, open('save_pitch_matrix_'+str(bar)+'ticks.p', 'wb'))
-	# to load run: pitch_matrix = pickle.load(open('save_pitch_matrix_'+str(bar)+'ticks.p', 'rb'))
 	
 	# chord_sequence = extract_chord_sequence(time_series_list, bar=96*4)
 	
