@@ -1,8 +1,21 @@
+> This is a daily **DAILY JOURNAL** comprising of notes, 
+thoughts and findings accompanying my work. It's to be 
+replaced by a proper README file at the end of the project. 
+
+---
+
+
 ***June 19, 2016 - Sunday***  
 
 Believe it or not, I accidentally ran `rm -rf /*` on my computer when i wanted to type  `rm -rf ./*`!!!.
 
-I stopped the deletion  when it was going thru `Applications/Evernote.app` directory. It was throwing `Permission denied` errors all over the place. But, it deleted Ableton Live and all my instrument patches. I ended up having to download Ableton from their website. It was easy because I registered it when I bought it. I'll have to re-install the patches some other time. I hope this is the whole extent of the damage.
+I stopped the deletion  when it was going thru `Applications/Evernote.app` directory. 
+It was throwing `Permission denied` errors all over the place. 
+But, it deleted Ableton Live and all my instrument patches. 
+I ended up having to download Ableton from their website. 
+It was easy because I registered it when I bought it. 
+I'll have to re-install the patches some other time. 
+I hope this is the whole extent of the damage.
 
 ---
 Deleting .DS_Store remotely on git repo:
@@ -47,7 +60,8 @@ midi.NoteOnEvent(tick=24, channel=0, data=[62, 127]),
 ```
 
 In a MIDI file, all NoteOn and NoteOff events are ordered sequentially. 
-* The `tick` argument is set to tick count after the most recent NoteOn or NoteOff Event. 
+* The `tick` argument is set to tick count after the most recent NoteOn or 
+NoteOff Event. 
 * `data` argument is equal to `[pitch, velocity]` of the current note. 
 * `velocity` is how hard the note is played. Varies from `0` to `127`.
 * If the `velocity` is set to `0` in a `NoteOnEvent()`, it becomes a `NoteOffEvent()`. 
@@ -61,19 +75,24 @@ preprocessing Stage 0 finished
 **IMPORTANT FINDING !!!**
 
 I have only worked with one single Bach Fugue MIDI File: bwv733.mid
-It looks like there were errors in this midi file. And there might be similar errors on other data files.
+It looks like there were errors in this midi file. And there might 
+be similar errors on other data files.
 ```
 at track=1: len(NoteOnEvent) = 849
             len(NoteOffEvent) = 850
 ```
 Also, my `preprocessing.py` script gave negative `duration` error. 
-However, when I imported the midi file to **Ableton Live** and then exported it back and then ran the `preprocessing.py` on it, all the negative `duration` errors were gone!!! and the redundant NoteOff events were also gone. 
+However, when I imported the midi file to **Ableton Live** and then 
+exported it back and then ran the `preprocessing.py` on it, all the 
+negative `duration` errors were gone!!! and the redundant NoteOff 
+events were also gone. 
 ```
 at track=1: len(NoteOnEvent) = 849
             len(NoteOffEvent) = 849
 ```
 
-I might need to manually import and export the midi files in and out of Ableton Live before feeding them to RNN as training set. 
+I might need to manually import and export the midi files in and 
+out of Ableton Live before feeding them to RNN as training set. 
 
 Tomorrow:  
 > Tests to check basic parameters.  
@@ -109,7 +128,8 @@ Melody: 1---2---2---1---5---5---5--|5|-|4|--6---6---4
 ..Bass: 1---3---3---3---2---2---2---2--|4|--4---4---4
 ```
 
-Set up the RNN such that the melody note at `time = t` is influenced by a melody note at `time = t-1` and bass note at `time = t`
+Set up the RNN such that the melody note at `time = t` is influenced
+by a melody note at `time = t-1` and bass note at `time = t`
 
 ---
 
@@ -122,8 +142,11 @@ Set up the RNN such that the melody note at `time = t` is influenced by a melody
 bwv733.mid ----> Ableton ------> |bwv733_t2.mid| -------> bwv733_io.mid
                                  |bwv733_t3.mid|
 ```
-When `bwv733.mid` is imported into and exported out of Ableton the timeSignature info in the midi file gets modified. I tried to reimport it from the original `bwv733.mid` file to no avail. 
-I'll abandon this endeavor now and instead will write a script to get the note value info based on all the tracks in the midi file. 
+When `bwv733.mid` is imported into and exported out of Ableton the timeSignature 
+info in the midi file gets modified. I tried to reimport it from the 
+original `bwv733.mid` file to no avail. 
+I'll abandon this endeavor now and instead will write a script to get 
+the note value info based on all the tracks in the midi file. 
 
 **chords**
 ```javascript
@@ -148,7 +171,8 @@ canonical_chord_vectors
 Working on chord-note similarity.  
 Today's to do list:
 
-*  Run the Chord Sequencer on a MIDI file. Calculate the sequence of chords per quarter note. 
+*  Run the Chord Sequencer on a MIDI file. Calculate the sequence 
+of chords per quarter note. 
 ```
 def extract_chord_sequence(filename):
 	# INPUT : filename STR, 
@@ -184,13 +208,15 @@ Note: When I have time I will think of a better way to construct
 the vocab of chords. The Root, 3rd, 5th and 7th should all have same 
 weights across the board including `dominant altered` and
 `minor harmonic octatonic scale`. Then, I have to find a way
-to deal with color tones for the more complicated chord. It's doable. Only not my top priority righ now.
+to deal with color tones for the more complicated chord. 
+It's doable. Only not my top priority righ now.
 
 Tomorrow:  
 
 * Time to go thru all `bwv*.mid` files to prepare the training data. 
 Use `os` module to take the filenames in and construct a `pitch_matrix` 
-and a `chord_sequence` for all of them. Then I can `cPickle` the output and feed it as training data to RNN model. 
+and a `chord_sequence` for all of them. Then I can `cPickle` 
+the output and feed it as training data to RNN model. 
 * build your custom RNN model on Lasagne.
 
 Here's the `pitch_matrix` for `bwv733.md`  
@@ -211,10 +237,12 @@ git push origin master
 ```
 [marekrei.com Theano Tutorial](http://www.marekrei.com/blog/theano-tutorial/)
 
-- Some files have 3/4 time signature. Better just take them out of the training set
+- Some files have 3/4 time signature. Better just take them 
+out of the training set
 - Some files have two movements in the same file.  
 
-I'm having a block accepting the idea of running the model with a sole naive pitch matrix as training data.
+I'm having a block accepting the idea of running the model 
+with a sole naive pitch matrix as training data.
 
 ---
 
@@ -231,8 +259,13 @@ Only consider notes that have low pitch and large duration.
 
 ---
 
-* I have the training data `pitch_matrix_list` – a list of size `29`. Each item of the list is a `pitch_matrix` of type `ndarray` and of shape `61-by-N` where `N` is dependent on the fugue. 
-* For each of the `29` fugues in the training set, I suppose I need to create 11 more fugues transposed one semitone up to fit all the rest of the possible roots.
+* I have the training data `pitch_matrix_list` – a list of size `29`. 
+Each item of the list is a 
+`pitch_matrix` of type `ndarray` and of shape `61-by-N` where `N` 
+is dependent on the fugue. 
+* For each of the `29` fugues in the training set, I suppose 
+I need to create 11 more fugues transposed one semitone up to fit 
+all the rest of the possible roots.
  
 ***June 25, 2016 - Saturday***
 
@@ -246,7 +279,47 @@ concatenate them into a single `pitch_matrix`. Each pickle is 130 MB of size.
 predicts a chord out of the 11 `canonical_chord_vectors`
 I manually defined and a `root` associated with it. 
 
+---
+
+RNN model cost function:
+```python 
+note_cost = binary_crossentropy(predictions, target).mean()
+note_predictions = predictions[predictions > .5]
+chord_predictions = get_chord(note_predictions)
+chord_cost = cosine_distance(chord_predictions, chord_target)
+
+```
+--- 
+
+I sat down and skimmed through some RNN sources including 
+Doug Eck and Jurgen Schmidhuber's 2002 paper, and
+![hexahedria.com](http://www.hexahedria.com/2015/08/03/composing-music-with-recurrent-neural-networks/).
+They have essentially made the most important points that 
+I had thought but was not able to implement in my model explicitly. 
+
+- ...that a musical piece can be transformed up and down 
+freely. And the result wouldn't change the compositional 
+information contained in it. Therefor, either all training data 
+should be recreated to represent the same composition in all 
+12 possible keys, or the whole training set should 
+be transposed to a single key –– typically C minor or C Major etc.
+It would be best to only include compositions that don't feature a
+key change.
+
+- RNN synthesized music loses general coherence past its
+memory window unless a chord structure is prestablished. Hence,
+the idea to have a `Stage 0` model generate a chord 
+progression that forms the backbone of the music. Subsequently,
+at `Stage 1` another model generates melodies based on this
+chord progression.
+
+---
+This link contains all works by Bach and their principal keys. 
+(http://imslp.org/wiki/List_of_works_by_Johann_Sebastian_Bach)
 
 
+
+
+.
 
 
