@@ -30,34 +30,12 @@ def cosine_distance(x,y):
 	return np.arccos(sim) / np.pi*180 # angle in degrees
 
 
-def get_chord(gr_pitches):
+def get_chord_from_gr_pitches(gr_pitches):
 	'''
 	INPUT: NDARRAY
 	OUTPUT: (STR, STR)
 	'''
 
-	out = []
-	for sh in range(12): 
-		# transpose up by sh semitones
-		gr_notes = pitches_to_notes(gr_pitches + sh)
-		dict_ = predict_chord_type(gr_notes)
-		dict_['shift'] = sh
-		out.append(dict_)
-
-	out.sort(key=lambda x: x['dist'], reverse=False) # reverse=False: ascending order
-	sh = out[0]['shift'] # smallest distance
-
-	root = D[-out[0]['shift']]
-	chord_type = out[0]['chord_type']
-	return root, chord_type, out
-
-
-def get_chord(gr_pitches):
-	'''
-	INPUT: NARRAY 
-	OUTPUT: (STR, STR) 
-	'''
-	
 	out = []
 	for sh in range(12): 
 		# transpose up by sh semitones
@@ -187,20 +165,20 @@ def	get_chord_similarity(target, chords_vocabulary):
 	return chord_similarity
 
 
-def get_chord_of_target(target):
+def get_chord(target):
 	
 	chords_vocabulary = get_chords_vocabulary()
 	chord_similarity = get_chord_similarity(target, chords_vocabulary)
 	
-	# most_similiar_chord_across_all_roots.shape = (12,)
+	# most_similar_chord_across_all_roots.shape = (12,)
 	# indices.shape = (12,)
 	# chord_similarity.shape = (12, 11) 
 	# for each root (C, C#, D ..,B) the closest chord type 
-	most_similiar_chord_across_all_roots = chord_similarity.max(axis=1)
+	most_similar_chord_across_all_roots = chord_similarity.max(axis=1)
 	indices = chord_similarity.argmax(axis=1)
 	
 	# (root, chord_type_index) is the closest chord to target.
-	root = most_similiar_chord_across_all_roots.argmax()
+	root = most_similar_chord_across_all_roots.argmax()
 	chord_type_index = indices[root]
 	print '{} {}'.format(D[root], chords_vocabulary[chord_type_index].name)
 	
@@ -260,8 +238,6 @@ def predict_chord_type(gr_notes):
 	return {'chord_type': chord_type,\
 	 		'chord_id': memory['chord_id'], \
 			'dist': memory['dist']}
-
-
 
 	
 	 

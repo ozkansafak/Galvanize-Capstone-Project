@@ -248,7 +248,7 @@ def extract_chord_sequence(time_series_list, bar=96):
 	for i, time in enumerate(time_sequence):
 		gr_pitches = extract_pitches(time_series_list, time, bar)
 		chord_sequence[i][0] = time
-		chord_sequence[i][1] = get_chord(gr_pitches)
+		chord_sequence[i][1] = get_chord_from_gr_pitches(gr_pitches)
 		print ''.join(chord_sequence[i][1])
 
 	return chord_sequence

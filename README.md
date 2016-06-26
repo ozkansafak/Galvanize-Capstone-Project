@@ -233,8 +233,18 @@ Only consider notes that have low pitch and large duration.
 
 * I have the training data `pitch_matrix_list` – a list of size `29`. Each item of the list is a `pitch_matrix` of type `ndarray` and of shape `61-by-N` where `N` is dependent on the fugue. 
 * For each of the `29` fugues in the training set, I suppose I need to create 11 more fugues transposed one semitone up to fit all the rest of the possible roots.
-* 
+ 
+***June 25, 2016 - Saturday***
 
+- Training data is ready.  I have `29` separate pickle files per each 
+12 parallel transposed keys. For instance, `pitch_matrix_24ticks_sh2.p` corresponds to sampling at every `24 ticks`. 
+`sh2` points out the original MIDI file has been 
+transposed up `2` semitones. 
+If I'm gonna use the whole `12` key corpus of `pitch_matrix` training set, I'll 
+concatenate them into a single `pitch_matrix`. Each pickle is 130 MB of size.
+- `get_chord` now works on a vector of total number of keys and 
+predicts a chord out of the 11 `canonical_chord_vectors`
+I manually defined and a `root` associated with it. 
 
 
 
