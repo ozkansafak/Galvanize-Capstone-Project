@@ -1,7 +1,7 @@
-from preprocess_3 import *
 from preprocess_2 import *
 from preprocess_1 import *
 
+import pickle
 import midi
 import re
 import os
@@ -44,8 +44,8 @@ def plot_pitch_matrix(pitch_matrix, title=None, xlabel=None, ylabel=None):
 	ax.set_ylim([0, pitch_matrix.shape[0]])
 	
 	
-	plt.ion()
-	plt.show()
+	#plt.ion()
+	#plt.show()
 	
 	
 	
@@ -248,7 +248,7 @@ def extract_chord_sequence(time_series_list, bar=96):
 	for i, time in enumerate(time_sequence):
 		gr_pitches = extract_pitches(time_series_list, time, bar)
 		chord_sequence[i][0] = time
-		chord_sequence[i][1] = find_chord(gr_pitches)
+		chord_sequence[i][1] = get_chord(gr_pitches)
 		print ''.join(chord_sequence[i][1])
 
 	return chord_sequence
@@ -268,7 +268,7 @@ def extract_pitch_matrix(time_series_list, bar=96):
 	return pitch_matrix
 
 
-def retrieve_all_io_files(dirname='../MIDI_data/io_files/io_files/4_4_fugues'):
+def retrieve_all_io_files(dirname='../MIDI_data/io_files/io_files/'):
 	dir = os.listdir(dirname)
 	io_files = []
 	for f in dir:
@@ -277,6 +277,34 @@ def retrieve_all_io_files(dirname='../MIDI_data/io_files/io_files/4_4_fugues'):
 			io_files.append(f)
 	return io_files
 
+
+		
+
+
+
+
+def get_bad_files():
+	r=[]
+	bad_files = []
+	for i, f in enumerate(retrieve_all_io_files('../MIDI_data/io_files/io_files/')): 
+		print 'processing', i, f
+		time_series_list = time_series_list_builder('../MIDI_data/io_files/io_files/' + f)
+	
+		l = note_value(time_series_list)
+
+		# compute ratio of all quarter and shorter notes played 
+		no_of_notes = reduce(lambda x, y: x+y, [e[1] for e in l])
+		no_of_96_and_less = \
+		reduce(lambda x, y: x+y, [e[1] for e in l if ((e[0] <= 96) and (e[0]%12 == 0))])
+
+		small_notes = [(k,v) for k, v in l if (k <= 96) and (k%6 ==0) ]
+				
+		if sum([elem[1] for elem in small_notes]) / float(no_of_notes) < .5:
+			bad_files.append(f)
+
+	return bad_files
+
+
 def main_pitch_matrix_generator():
 	'''
 	Generates the pitch_matrices for all io_files
@@ -284,50 +312,112 @@ def main_pitch_matrix_generator():
 	'''
 	
 	#retrieve all io_files
-	dir = retrieve_all_io_files()
+	dir = retrieve_all_io_files(dirname='../MIDI_data/io_files/io_files/4_4_fugues')
 	#....
 	
+
+def get_lo_hi_pitches(time_series_list):
+	
+	lo, hi = 128, 0
+	for ts in time_series_list:
+		pitch = [note[1] for note in ts]
+		if min(pitch) < lo:
+			lo = min(pitch) 
+		if max(pitch) > hi:
+			hi = max(pitch) 
+		
+	
+	return lo, hi
+	
+def get_lo_hi_across_all_fugues():
+
+	lo, hi = [], []
+	
+	for f in retrieve_all_io_files('../MIDI_data/io_files/io_files/4_4_fugues/'): 
+		# print 'get_lo_hi_across_all_fugues():{} '.format(f)
+		time_series_list = time_series_list_builder('../MIDI_data/io_files/io_files/4_4_fugues/' + f)
+
+		lo_1, hi_1 = get_lo_hi_pitches(time_series_list)
+		lo.append(lo_1)
+		hi.append(hi_1)
+
+	return lo, hi
+
+
+def transpose_up_1_fret(time_series_list):
+	
+	time_series_list_new = []
+	for ts in time_series_list:
+		ts_new = [(time, pitch+1, duration) for (time, pitch, duration) in ts]
+		time_series_list_new.append(ts_new)
+			
+	return time_series_list_new
 
 
 if __name__ == '__main__':
 	'''
 	INPUT: filename STR 
-	OUTPUT: time_series_list LIST [[ (time INT, pitch INT, duration INT) TUPLE, ...], ...]
+	OUTPUT: time_series_list LIST [[ (time INT, pitch INT, duration INT) TUPLE, ...], ...] 
 	
-	filename of MIDI file
+	filename of MIDI file 
 	'''
-	bad_files = get_bad_files()
 	
 	r = []
-	for f in retrieve_all_io_files(): 
-		time_series_list = time_series_list_builder('../MIDI_data/io_files/io_files/4_4_fugues' + f)
-		
-		l = note_value(time_series_list)
+	bar = 96/4
 
-		# compute ratio of all quarter and shorter notes played 
-		no_of_notes = reduce(lambda x, y: x+y, [e[1] for e in l])
-		no_of_96_and_less = \
-		reduce(lambda x, y: x+y, [e[1] for e in l if ((e[0] <= 96) and (e[0]%12 == 0))])
-		ratio_96 = float(no_of_96_and_less) / no_of_notes
-		r.append(ratio_96)
+	lo, hi = get_lo_hi_across_all_fugues()
+	lowest_pitch, highest_pitch = min(lo), max(hi)+12
+	print '\nlowest_pitch, highest_pitch'
+	print '{}          , {}\n'.format(lowest_pitch, highest_pitch)
+	
+	dirname = '../MIDI_data/io_files/io_files/4_4_fugues/'
+	for shift in range(0):#,12):
+
+		pitch_matrix = []
+		for f_no, f in enumerate(retrieve_all_io_files(dirname)): 
+			print '\nshifting up {}, f_no {}'.format(f_no, shift)
+			time_series_list = time_series_list_builder(dirname + f)
+			if shift > 0:
+				time_series_list = transpose_up_1_fret(time_series_list)
+			p = extract_pitch_matrix(time_series_list, bar=bar)[lowest_pitch:highest_pitch+1, :]
+			pitch_matrix.append(p)
+
+		#pickle.dump(pitch_matrix, open('pitch_matrix_'+str(bar)+'ticks_sh'+str(shift)+'.p', 'wb'))
+		#print 'save: pitch_matrix_'+str(bar)+'ticks_sh'+str(shift)+'.p\n'
 		
-		print '\n', f[:-7], '--', ratio_96
-		print 'ticks\t  count'
-		for k, v in l:
-			print ' ', k, '\t:' , v
-			
-		small_notes = []
-		for k, v in l:
-			if (k <= 96) and (k%6 ==0):
-				small_notes.append((k,v))
-			
-			
-			
+		
+		# l = note_value(time_series_list)
+		# compute ratio of all quarter and shorter notes played 
+		# no_of_notes = reduce(lambda x, y: x+y, [e[1] for e in l])
+		# no_of_96_and_less = \
+		# 	reduce(lambda x, y: x+y, [e[1] for e in l if ((e[0] <= 96) and (e[0]%12 == 0))])
+		# ratio_96 = float(no_of_96_and_less) / no_of_notes
+		# r.append(ratio_96)
+		
+		# print '\n',f_no, f[:-7], '--', ratio_96
+		# print 'ticks\t  count'
+		# for k, v in l:
+		# 	if k <= 96*8:
+		# 		print ' ', k, '\t:' , v
+		
+		
 	
 	
 	
-	# pitch_matrix = extract_pitch_matrix(time_series_list, bar=96/2)
-	# plot_pitch_matrix(pitch_matrix, title='bwv733.mid pitch_matrix', xlabel = 'quarter note increments', ylabel='midi notes (0-127)')
+	if False: 
+		f = retrieve_all_io_files(dirname='../MIDI_data/io_files/io_files/4_4_fugues/')
+		for i, pm in enumerate(pitch_matrix):
+			# if (f[i] == 'bwv653_io.mid') or (f[i] == 'bwv552f_io.mid'):
+				plt.close('all')
+				print 'plotting {} {}'.format(i, f[i][:-7])
+				plot_pitch_matrix(pm, title='{} pitch_matrix'.format(f[i][:-7]), \
+					xlabel='{}-tick increments'.format(bar), \
+					ylabel='midi notes: {}-{}'.format(lowest_pitch, highest_pitch))
+				plt.savefig('{}--{}'.format(f[i][:-7],'pitch_matrix.png'))
+		
+	# to dump pickle run: pickle.dump(pitch_matrix, open('save_pitch_matrix_'+str(bar)+'ticks.p', 'wb'))
+	# to load run: pitch_matrix = pickle.load(open('save_pitch_matrix_'+str(bar)+'ticks.p', 'rb'))
+	
 	# chord_sequence = extract_chord_sequence(time_series_list, bar=96*4)
 	
 	

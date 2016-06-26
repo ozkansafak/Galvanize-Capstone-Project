@@ -8,7 +8,7 @@ from lasagne.objectives import binary_crossentropy, aggregate
 
 def build_rnn(sequence_length=8, num_units=512):
 	'''
-	INPUT:
+	INPUT: 
 	OUTPUT: 
 	'''	
 	
@@ -24,11 +24,16 @@ def build_rnn(sequence_length=8, num_units=512):
 	return l_out
 
 def total_cost(predictions, target):
+	'''
+	INPUT np.array of size (73,), np.array of size (73,)
+	OUTPUT: 
+	'''
 	note_cost = binary_crossentropy(predictions, target).mean()
 	note_predictions = predictions[predictions > .5]
 	
+	chord_target = get_chord(pitches_to_notes(target))
+	
 	chord_predictions = get_chord(note_predictions)
-	chord_target = get_chord(target)
 	chord_cost = cosine_distance(chord_predictions, chord_target)
 	
 	return note_cost + chord_cost

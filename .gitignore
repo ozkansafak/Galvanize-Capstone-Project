@@ -1,3 +1,5 @@
 /Source_Code/*.mid
 /Source_Code/*.pyc
+/Source_Code/*.p
+/Source_Code/training_data/*.p
 .DS_Store

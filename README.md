@@ -229,10 +229,11 @@ Then cut down your feature set accordingly
 - Incorporate **note duration** in extract_chord(). 
 Only consider notes that have low pitch and large duration.
 
+---
 
-
-
-
+* I have the training data `pitch_matrix_list` – a list of size `29`. Each item of the list is a `pitch_matrix` of type `ndarray` and of shape `61-by-N` where `N` is dependent on the fugue. 
+* For each of the `29` fugues in the training set, I suppose I need to create 11 more fugues transposed one semitone up to fit all the rest of the possible roots.
+* 
 
 
 
