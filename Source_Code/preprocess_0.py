@@ -353,7 +353,23 @@ def transpose_up_1_fret(time_series_list):
 			
 	return time_series_list_new
 
-
+def clip_pitch_matrix(pitch_matrix):
+	jmax = 10**10
+	for p in pitch_matrix:
+		jmax = min((jmax, p.shape[1]))
+		
+		
+	num_pitches = pitch_matrix[0].shape[0]
+	new_pitch_matrix = np.zeros((len(pitch_matrix), num_pitches, jmax))
+	for i, p in enumerate(pitch_matrix):
+		new_pitch_matrix[i] = p[:,:jmax]
+		
+	return new_pitch_matrix
+	
+	
+	
+	
+	
 if __name__ == '__main__':
 	'''
 	INPUT: filename STR 
@@ -368,7 +384,8 @@ if __name__ == '__main__':
 	lo, hi = get_lo_hi_across_all_fugues()
 	lowest_pitch, highest_pitch = min(lo), max(hi)+12
 	print '\nlowest_pitch, highest_pitch'
-	print '{}          , {}\n'.format(lowest_pitch, highest_pitch)
+	print '{}          , {}\n{}'.format(lowest_pitch, highest_pitch, '-'*30)
+	print 'in model.py, set NUM_FEATURES={}\n{}'.format(highest_pitch-lowest_pitch+1, '-'*30)
 	
 	dirname = '../MIDI_data/io_files/io_files/4_4_fugues/'
 	for sh in range(0):#,12):
@@ -381,29 +398,33 @@ if __name__ == '__main__':
 				time_series_list = transpose_up_1_fret(time_series_list)
 			p = extract_pitch_matrix(time_series_list, bar=bar)[lowest_pitch:highest_pitch+1, :]
 			pitch_matrix.append(p)
-
-		#pickle.dump(pitch_matrix, open('pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p', 'wb'))
-		#print 'save: pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p\n'
-		# # pitch_matrix = pickle.load(open('training_data/pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p', 'rb'))
-
 		
-		# l = note_value(time_series_list)
-		# compute ratio of all quarter and shorter notes played 
-		# no_of_notes = reduce(lambda x, y: x+y, [e[1] for e in l])
-		# no_of_96_and_less = \
-		# 	reduce(lambda x, y: x+y, [e[1] for e in l if ((e[0] <= 96) and (e[0]%12 == 0))])
-		# ratio_96 = float(no_of_96_and_less) / no_of_notes
-		# r.append(ratio_96)
+	pitch_matrix = clip_pitch_matrix(pitch_matrix)
 		
-		# print '\n',f_no, f[:-7], '--', ratio_96
-		# print 'ticks\t  count'
-		# for k, v in l:
-		# 	if k <= 96*8:
-		# 		print ' ', k, '\t:' , v
+	#pickle.dump(pitch_matrix, open('pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p', 'wb'))
+	#print 'save: pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p\n'
+	# # pitch_matrix = pickle.load(open('training_data/pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p', 'rb'))
+	
+	
+	# l = note_value(time_series_list)
+	# compute ratio of all quarter and shorter notes played 
+	# no_of_notes = reduce(lambda x, y: x+y, [e[1] for e in l])
+	# no_of_96_and_less = \
+	# 	reduce(lambda x, y: x+y, [e[1] for e in l if ((e[0] <= 96) and (e[0]%12 == 0))])
+	# ratio_96 = float(no_of_96_and_less) / no_of_notes
+	# r.append(ratio_96)
+	
+	# print '\n',f_no, f[:-7], '--', ratio_96
+	# print 'ticks\t  count'
+	# for k, v in l:
+	# 	if k <= 96*8:
+	# 		print ' ', k, '\t:' , v
 		
 	
 	
 	if False: 
+		# plot the pitch_matrices and save 
+		
 		f = retrieve_all_io_files(dirname='../MIDI_data/io_files/io_files/4_4_fugues/')
 		for i, pm in enumerate(pitch_matrix):
 			# if (f[i] == 'bwv653_io.mid') or (f[i] == 'bwv552f_io.mid'):
