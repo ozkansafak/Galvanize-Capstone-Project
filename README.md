@@ -1,11 +1,10 @@
-> This is a daily **DAILY JOURNAL** comprising of notes, 
-thoughts and findings accompanying my work. It's to be 
-replaced by a proper README file at the end of the project. 
+> The following is a project development daily journal.
+It comprises of notes, thoughts and findings accompanying my work.
+It is to be replaced by a proper README file at the end of the project. 
 
 ---
 
-
-***June 19, 2016 - Sunday***  
+###### *June 19, 2016 - Sunday*
 
 Believe it or not, I accidentally ran `rm -rf /*` on my computer when i wanted to type  `rm -rf ./*`!!!.
 
@@ -100,7 +99,7 @@ Tomorrow:
 
 ---
 
-***June 20, 2016 - Monday***
+###### *June 20, 2016 - Monday*
 
 Had a great meeting/ Brainstorming session with Kamil.  
 **A Crude Road Map:**
@@ -111,7 +110,6 @@ Had a great meeting/ Brainstorming session with Kamil.
 - Stage 2: INPUT: Ignore the Bass Line and consider the new Melody created
            OUTPUT: Write a new Melody.
 ```
-
 
 **pre-processing Helper Functions.**
 ```
@@ -133,8 +131,7 @@ by a melody note at `time = t-1` and bass note at `time = t`
 
 ---
 
-***June 21, 2016 - Tuesday***
-
+###### *June 21, 2016 - Tuesday*
 
 **Preprocess Pipe Line**
 ```
@@ -166,7 +163,7 @@ canonical_chord_vectors
 
 ---
 
-***June 22, 2016 - Wednesday***
+###### *June 22, 2016 - Wednesday*
 
 Working on chord-note similarity.  
 Today's to do list:
@@ -227,8 +224,7 @@ and here's the canonical_chords_vector
 ![canonical_chords_vector](Source Code/canonical_chord_vectors.png)
 
 ---
-
-***June 23, 2016 - Thursday***  
+###### *June 23, 2016 - Thursday*  
 To clean up folders in github repo remotely.
 ```bash
 git rm -r --cached some-directory
@@ -245,8 +241,7 @@ I'm having a block accepting the idea of running the model
 with a sole naive pitch matrix as training data.
 
 ---
-
-***June 24, 2016 - Friday***
+###### *June 24, 2016 - Friday*
 
 - Find key of the fugue by pitch counter.
 - Look for the pitchwise span of each fugue. 
@@ -266,8 +261,9 @@ is dependent on the fugue.
 * For each of the `29` fugues in the training set, I suppose 
 I need to create 11 more fugues transposed one semitone up to fit 
 all the rest of the possible roots.
- 
-***June 25, 2016 - Saturday***
+---
+
+###### *June 25, 2016 - Saturday*
 
 - Training data is ready.  I have `29` separate pickle files per each 
 12 parallel transposed keys. For instance, `pitch_matrix_24ticks_sh2.p` corresponds to sampling at every `24 ticks`. 
@@ -306,20 +302,59 @@ be transposed to a single key –– typically C minor or C Major etc.
 It would be best to only include compositions that don't feature a
 key change.
 
-- RNN synthesized music loses general coherence past its
-memory window unless a chord structure is prestablished. Hence,
-the idea to have a `Stage 0` model generate a chord 
-progression that forms the backbone of the music. Subsequently,
-at `Stage 1` another model generates melodies based on this
-chord progression.
+- RNN synthesized music loses coherence past its
+memory window unless a chord structure is pre-established. Hence,
+the idea to have a `Stage 0` model that generates a chord 
+progression to form a backbone of the syhtesized composition.
+Subsequently at `Stage 1`, another model will generate the 
+melodies based on this chord progression.
 
 ---
-This link contains all works by Bach and their principal keys. 
+
+**How to deal with chord progression and separate keys**
+
+1. Transpose all training set to the rootkey of C.
+![Link to keys of all Fugues of Bach]
 (http://imslp.org/wiki/List_of_works_by_Johann_Sebastian_Bach)
 
+2. Prescribe a chord progression for the model where a
+cyclical chord progression is enforced along with the 
+target pitch_matrix ,
+thereby, circumventing `Stage 0`. 
+
+`chord_cost` term
+`chord_target = get_chord(target) `
+---
+###### *June 26, 2016 - Sunday*
+
+![www.bachcentral.com/midiindexcomlete.html](www.bachcentral.com/midiindexcomlete.html)
+
+Eben Olson's PyData conference ![Talk](https://www.youtube.com/watch?v=dtGhSE1PFh0) 
+by Eben Olson from Yale University. NYC, Nov 2015.  
+
+- Amongst all the Pyhton Conference Talks on Neural Networks, theano and lasagne, I found 
+![https://github.com/Lasagne/Recipes](https://github.com/Lasagne/Recipes) the most useful to 
+actually help me get a RNN pipeline on lasagne. 
+- Fil's notes `ssh` and `scp` on his repo are also very concise and helpful. 
+- Tomorrow I have to get the model.py in proper running shape. Then carry out some 
+experiments in `chords_cost` term. 
+
+---
+###### *June 27, 2016 - Monday*
+### a Word of Advice from me to myself:  ALWAYS BE MODELING !!!
+
+Reference for optimization algorithms (Adagrad etc):
+![http://sebastianruder.com/optimizing-gradient-descent/index.html#adagrad](http://sebastianruder.com/optimizing-gradient-descent/index.html#adagrad)
+
+##### `tmux` tips from Fil:
+>- Disconnect: `Ctrl+B` and let go. Then `D`
+>Then you can exit safely and leave the job running.
+>- Reconnect to `ssh g2`
+>`tmux attach`: reconnect to the session
+>`tmux ls`: shows all sessions running
+>- `exit` ends the `tmux` session.
 
 
 
 .
-
 
