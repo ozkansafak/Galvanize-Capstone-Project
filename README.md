@@ -374,19 +374,21 @@ You can exit safely and leave the job running.
 
 Further Improvements:  
 
-1. Get `generate_a_fugue()` write the output to a 
+* Get `generate_a_fugue()` write the output to a 
 pickle file as `time_series`. 
-2. Incorporate polyphonic capability. (select `predictions[prediction>threshold]`)
-3. Compute `cross_validation_error`.
-4. Each successive Fugue in training data should be separated by a 
-pause of length `SEQUENCE_LENGTH`. (Lee's start-marker -- end-marker idea)
-5. Network will ultimately be trained on a 12-step, sequentially transposed `pitch_matrix`.
-6. `chord_sequence` and `chord_cost`
-7. 
-8. 
+* Incorporate polyphonic capability. (select `predictions[prediction>threshold]`)
+* Compute `cross_validation_error`.
+* Each successive Fugue in training data should be separated by a   
+pause of length `SEQUENCE_LENGTH`. (Lee's start-marker -- end-marker idea)  
+* Network will ultimately be trained on a 12-step, sequentially transposed `pitch_matrix`.  
+* 	- Build `chord_sequence` for the training data, and 
+ 	- incorporate the `chord_cost` term  based on the  `chord_sequence` 
 
 
 
 
 .
+
+
+
 

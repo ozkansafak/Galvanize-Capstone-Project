@@ -1,5 +1,6 @@
 import midi
 import os
+import pickle
 
 """	Stage 1: MIDI to time_series conversion
 """
@@ -121,10 +122,23 @@ def time_series_to_MIDI_track(time_series):
 	eot = midi.EndOfTrackEvent(tick=1)
 	track.append(eot)
 	
+	pattern = midi.Pattern()
+	pattern.append(track)
+	midi.write_midifile("example.mid", pattern)
+	
 	return track
 
 
-
+bar = 96/4
+time_series = []
+dir = 'Syntesized_Fugues/'
+filename = dir + 'fugue_N768epoch180.p'
+pitch_matrix = pickle.load(open(filename, 'r'))
+for time, vec in enumerate(pitch_matrix):
+	for pitch, key in enumerate(vec):
+		if key == 1:
+			time_series.append((time*bar, pitch, bar))
+			
 
 
 
