@@ -51,18 +51,22 @@ def generate_a_fugue(epoch, N=96/4*16*2):
 	# generate N sequential notes. 	
 	fugue = np.zeros((N, NUM_FEATURES))
 	
-	x, _ = make_batch(p, pitch_matrix)
+	x, _ = make_batch(p, pitch_matrix, 1)
 	print "generate_a_fugue(epoch={})".format(epoch)
 	counter = 0
 	for i in range(N):
 		# Pick only a single note that got assigned the highest probability.
 		# Will be modified to accommodate polyphonic music creation
-		
-		predict = probs(x).ravel()
-		print 'predict.shape={}'.format(predict.shape)
-		print 'x.shape={}'.format(x.shape)
-		ix = np.argmax(predict)
-		print "i={}, ix={}".format(i,ix)
+			
+		predict = probs(x)#.ravel()
+		# probs(x).shape:  (1, 73)
+		# print 'probs(x).shape: ', probs(x).shape 
+		# print 'predict.shape={}'.format(predict.shape)
+		# print 'x.shape={}'.format(x.shape)
+		ix = np.argmax(predict, axis=1)
+		# print "i={}, ix={}".format(i,ix)
+
+		#    ... for polyphony:
 		# predict = probs(x).ravel()
 		# ix = predict > THRESHOLD
 
