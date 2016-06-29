@@ -1,3 +1,5 @@
+import pyaudio
+import wave
 import midi
 import os
 import pickle
@@ -91,6 +93,27 @@ def main_merge_tracks():
 ==============================================================================
 '''
 
+
+def mp3_player(songpath):
+	chunk = 1024
+	wf = wave.open(songpath, 'rb')
+	p = pyaudio.PyAudio()
+
+	stream = p.open(
+		format = p.get_format_from_width(wf.getsampwidth()),
+		channels = wf.getnchannels(),
+		rate = wf.getframerate(),
+		output = True)
+	data = wf.readframes(chunk)
+
+	print "... playing music. \n    Ctrl+C to break"
+	while data != '':
+		stream.write(data)
+		data = wf.readframes(chunk)
+	
+
+	stream.close()
+	p.terminate()
 
 	
 if __name__=='__main__':

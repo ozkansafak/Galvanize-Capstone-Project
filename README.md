@@ -406,6 +406,7 @@ pause of length `SEQUENCE_LENGTH`. (Lee's start-marker -- end-marker idea)
 
 ----
 
+##### *June 28, 2016 - Tuesday*
 I made a New Decision.  
 Polyphony might require a more novel Network Architecture 
 and a Modeling Schema. Right now, my target is to produce something 
@@ -429,10 +430,24 @@ MIDI output saved at
     - octave shift: The training data was shifted down by 2 octaves
 
 ![rnn_param_defns](Source_Code/png_files/rnn_param_defns.png)  
+
+
+The illustration for the `pitch_matrix` (on the left) and the `X` matrix.  
+- `pitch_matrix` is comprised of all fugues appended together. (shape: `N`-by-`NUM_FEATURES`)  
+- `X` is a 3D tensor of data points, (shape:`data_size`-by-`SEQUENCE_LENGTH`-by-`NUM_FEATURES`, where `data_size = N - SEQUENCE_LENGTH`)  
+- `Y`  is a 2D tensor of corresponding target 2D tensor (shape:`data_size`-by-`NUM_FEATURES`  
+  
 ![rnn_training_tensor](Source_Code/png_files/rnn_training_tensor.png)  
 
+---
 
+##### *June 27, 2016 - Wednesday*
 
+Command to see Disk Usage on ssh: `df -h .`   
 
-
+* code cleanup
+* 	- Work with classes and objects.   
+	- Attach appropriate functions to `pitch_matrix` and `time_series` objects. 
+    
+    
 
