@@ -219,11 +219,11 @@ the output and feed it as training data to RNN model.
 * build your custom RNN model on Lasagne.
 
 Here's the `pitch_matrix` for `bwv733.md`  
-![pitchmatrix](Source_Code/pitch_matrix.png)  
+![pitchmatrix](Source_Code/png_files/pitch_matrix.png)  
 
 
 and here's the canonical_chords_vector  
-![canonical_chords_vector](Source_Code/canonical_chord_vectors.png)
+![canonical_chords_vector](Source_Code/png_files/canonical_chord_vectors.png)
 
 ---  
 
@@ -314,6 +314,8 @@ progression to form a backbone of the syhtesized composition.
 Subsequently at `Stage 1`, another model will generate the 
 melodies based on this chord progression.
 
+![memory_cell](Source_Code/png_files/memory_cell.png)  
+![rnn_architecture](Source_Code/png_files/rnn_architecture.png)  
 ---
 
 **How to deal with chord progression and separate keys**
@@ -371,11 +373,29 @@ You can exit safely and leave the job running.
 >- `exit`: end the `tmux` session.
 
 ---
+##### *June 27, 2016 - Monday*
+Last night, for once, I left Galvanize at 10ish. 
+But, I worked at home from 11 pm to 3:30AM. 
+I was able to `pickle.dump()` the `pitch_matrix` 
+of a synthesized fugue on AWS before my laptop battery ran out. 
+In the morning, I
+retrieved the `.p` file and wrote it to a MIDI file and 
+played it on Ableton. I did all that during the daily scrum meeting. 
 
-Further Improvements:  
+I had set the model to extract only a single line at a time step. 
+Though, the audio file sounded gibberish with erratic 
+random jumps between notes,
+it's apparent that it's beginning to learn some patterns. 
+It was repeating some bass notes, and was constrained within an 
+approximately 3-octave range. MIDI file is kept under 
+`Synthesized_Fugues/fugue_N768epoch180.mid`
+
+This midi file is 
+
+##### Further Improvements:  
 
 * Get `generate_a_fugue()` write the output to a 
-pickle file as `time_series`. 
+pickle file as `time_series` and write to a MIDI file.. 
 * Incorporate polyphonic capability. (select `predictions[prediction>threshold]`)
 * Compute `cross_validation_error`.
 * Each successive Fugue in training data should be separated by a   
@@ -384,8 +404,31 @@ pause of length `SEQUENCE_LENGTH`. (Lee's start-marker -- end-marker idea)
 * 	- Build `chord_sequence` for the training data, and 
  	- incorporate the `chord_cost` term  based on the  `chord_sequence` 
 
+----
 
+I made a New Decision.  
+Polyphony might require a more novel Network Architecture 
+and a Modeling Schema. Right now, my target is to produce something 
+that sounds decent and playable. Therefor, I'll focus on training
+the model solely on monophonic bass lines extracted from the 
+`pitch_matrix`.
 
+I got the results out of the model for a polyhonic training dataset
+to a monophonic output. The structure is very clear, even though
+the music itself is not very exciting.  
+Trained only for the first 4 bars of `pitch_matrix`
+```python
+SEQUENCE_LENGTH = 48  
+THRESHOLD = .5  
+```
+MIDI output saved at
+`Synthesized_Fugues/fugue_N768epoch311.mid`
+
+* Postprocess the synthesized fugues on Python to incorporate:  
+	- Legato: successive notes of same pitch must be continuously played.
+    - octave shift: The training data was shifted down by 2 octaves
+
+![rnn_param_defns](Source_Code/png_files/rnn_param_defns.png)  
 
 .
 

@@ -382,7 +382,7 @@ if __name__ == '__main__':
 	bar = 96/4
 
 	lo, hi = get_lo_hi_across_all_fugues()
-	lowest_pitch, highest_pitch = min(lo), max(hi)+12
+	lowest_pitch, highest_pitch = min(lo), max(hi) + 12
 	print '\nlowest_pitch, highest_pitch'
 	print '{}          , {}\n{}'.format(lowest_pitch, highest_pitch, '-'*30)
 	print 'in model.py, set NUM_FEATURES={}\n{}'.format(highest_pitch-lowest_pitch+1, '-'*30)

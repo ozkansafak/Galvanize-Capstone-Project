@@ -91,57 +91,8 @@ def main_merge_tracks():
 ==============================================================================
 '''
 
-def time_series_to_MIDI_track(time_series):
-	'''
-	INPUT: time_series LIST [(time, pitch, duration), ...]
-	OUTPUT: track midi.Track()
+
 	
-	This is going to be used to convert RNN generated fugues back to MIDI
-	'''
-	track = midi.Track()
-	
-	# U list of noteEvents [('on', time, pitch), ...]
-	U = []
-	for (time, pitch, duration) in time_series:
-		U.append(('on', time, pitch))
-		U.append(('off', time+duration, pitch))
-	
-	#order the list of events	
-	U.sort(key=lambda x: x[1])
-	cursor = 0
-	for (typ, time, pitch) in U:
-		tick = time - cursor
-		if typ == 'on':
-			o = midi.NoteOnEvent(tick=tick, velocity=127, pitch=pitch)
-		else:
-			o = midi.NoteOffEvent(tick=tick, velocity=127, pitch=pitch)
-		track.append(o)
-		cursor = time
-
-	# Add end of track event
-	eot = midi.EndOfTrackEvent(tick=1)
-	track.append(eot)
-	
-	pattern = midi.Pattern()
-	pattern.append(track)
-	midi.write_midifile("example.mid", pattern)
-	
-	return track
-
-
-bar = 96/4
-time_series = []
-dir = 'Syntesized_Fugues/'
-filename = dir + 'fugue_N768epoch180.p'
-pitch_matrix = pickle.load(open(filename, 'r'))
-for time, vec in enumerate(pitch_matrix):
-	for pitch, key in enumerate(vec):
-		if key == 1:
-			time_series.append((time*bar, pitch, bar))
-			
-
-
-
 if __name__=='__main__':
 	main_merge_tracks()
 

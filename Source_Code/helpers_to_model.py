@@ -1,4 +1,5 @@
 import numpy as np	
+import midi
 D = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
 
@@ -138,6 +139,152 @@ def get_chord(target):
 	for i in range(root):
 		out = transpose_target_up_1_fret(out)
 	return out
-	
+
+
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
+
+def flatten_pitch_matrix(pitch_matrix):
+	'''
+	INPUT: list of 2d np.arrays 
+	OUTPUT: 2d np.array 
+	'''
+	# flatten pitch_matrix
+	pitch_matrix_long = pitch_matrix[0]
+	for n in range(len(pitch_matrix)-1):
+		pitch_matrix_long = np.column_stack((pitch_matrix_long, pitch_matrix[n+1]))
+
+	# transpose it to swap the axes. 
+	# pitch_matrix.shape = (N, NUM_FEATURES)
+	pitch_matrix = np.transpose(pitch_matrix_long)	
+	return pitch_matrix
+
+'''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
+   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
+   \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
+
+def make_monophonic(pitch_matrix):
+	'''
+	This is a preprocess step that's invoked in model.py on AWS
+	'''
+	# pitch_matrix is already flattened upon being loaded in model.py
+	# 		pitch_matrix.shape[1] = 73
+	c=0
+	for vec in pitch_matrix:
+		c+=1
+		for i, key in enumerate(vec):
+			if key == 1: 
+				break
+		vec[i+1:] = 0
+	
+	return pitch_matrix
+
+'''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
+   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
+   \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
+
+def make_time_series(pitch_matrix):
+
+	bar = 96/4
+	dir = 'Synthesized_Fugues/'
+	time_series = []
+	for t_step, vec in enumerate(pitch_matrix):
+		for pitch, key in enumerate(vec):
+			if key == 1:
+				time_series.append((t_step*bar, pitch, bar))
+		
+	return time_series
+
+'''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
+   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
+   \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
+
+def time_series_legato(time_series):
+	'''
+	a Post-processing function
+	time series is a single list of tuples 
+	
+	This only works for monophonic time_series
+	'''
+	pitch_previous = -1
+	new_time_series = []
+	for (time, pitch, duration) in time_series:
+		if pitch == pitch_previous:
+			new_time_series.pop()
+			new_time_series.append((time_previous, pitch, duration_previous + duration))
+			duration_previous = duration_previous+duration
+		else:
+			new_time_series.append((time, pitch, duration))
+			duration_previous = duration
+			pitch_previous = pitch
+			time_previous = time
+
+	return new_time_series
+
+'''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
+   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
+   \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
+
+def time_series_to_MIDI_file(time_series, filename="Synthesized_Fugues/out.mid"):
+	'''
+	INPUT: time_series LIST [(time, pitch, duration), ...]
+	OUTPUT: track midi.Track()
+	
+	This is going to be used to convert RNN generated fugues back to MIDI
+	'''
+	track = midi.Track()
+	
+	# U list of noteEvents [('on', time, pitch), ...]
+	U = []
+	for (time, pitch, duration) in time_series:
+		U.append(('on', time, pitch))
+		U.append(('off', time+duration, pitch))
+	
+	#order the list of events	
+	U.sort(key=lambda x: x[1])
+	cursor = 0
+	for (typ, time, pitch) in U:
+		tick = time - cursor
+		if typ == 'on':
+			o = midi.NoteOnEvent(tick=tick, velocity=127, pitch=pitch)
+		else:
+			o = midi.NoteOffEvent(tick=tick, velocity=127, pitch=pitch)
+		track.append(o)
+		cursor = time
+
+	# Add end of track event
+	eot = midi.EndOfTrackEvent(tick=1)
+	track.append(eot)
+	
+	pattern = midi.Pattern()
+	pattern.append(track)
+	midi.write_midifile(filename, pattern)
+	
+	return
+
+
+if __name__ == '__main__':
+	time_series = make_time_series(pitch_matrix)
+	time_series = time_series_legato(time_series)
+	time_series_to_MIDI_file(time_series)
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
