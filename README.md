@@ -1,4 +1,4 @@
->*<sup>The following is a project development daily journal.
+ =100>*<sup>The following is a project development daily journ =100x20al.
 It comprises of notes, thoughts and findings accompanying my work.
 It is to be replaced by a proper README file at the end of the project. </sup>*
 
@@ -428,10 +428,10 @@ MIDI output saved at
 	- Legato: successive notes of same pitch must be continuously played.
     - octave shift: The training data was shifted down by 2 octaves
 
-![rnn_param_defns](Source_Code/png_files/rnn_param_defns.png)  
-![rnn_training_tensor](Source_Code/png_files/rnn_training_tensor.png)  
+![rnn_param_defns](Source_Code/png_files/rnn_param_defns.png =100)  
+![rnn_training_tensor](Source_Code/png_files/rnn_training_tensor.png =150)  
 
-.
+
 
 
 
