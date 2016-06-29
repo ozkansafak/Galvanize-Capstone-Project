@@ -429,6 +429,7 @@ MIDI output saved at
     - octave shift: The training data was shifted down by 2 octaves
 
 ![rnn_param_defns](Source_Code/png_files/rnn_param_defns.png)  
+![rnn_training_tensor](Source_Code/png_files/rnn_training_tensor.png)  
 
 .
 
