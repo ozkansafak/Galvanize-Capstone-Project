@@ -340,8 +340,10 @@ def get_lo_hi_across_all_fugues():
 		lo_1, hi_1 = get_lo_hi_pitches(time_series_list)
 		lo.append(lo_1)
 		hi.append(hi_1)
-
-	return lo, hi
+	
+	lowest_pitch, highest_pitch = min(lo), max(hi)
+	
+	return lowest_pitch, highest_pitch
 
 
 def transpose_up_1_fret(time_series_list):
@@ -378,21 +380,22 @@ if __name__ == '__main__':
 	filename of MIDI file 
 	'''
 	
-	r = []
+	# r = []
+	
 	bar = 96/4
-
-	lo, hi = get_lo_hi_across_all_fugues()
-	lowest_pitch, highest_pitch = min(lo), max(hi) + 12
+	lowest_pitch, highest_pitch = get_lo_hi_across_all_fugues()
+	
 	print '\nlowest_pitch, highest_pitch'
 	print '{}          , {}\n{}'.format(lowest_pitch, highest_pitch, '-'*30)
 	print 'in model.py, set NUM_FEATURES={}\n{}'.format(highest_pitch-lowest_pitch+1, '-'*30)
 	
 	dirname = '../MIDI_data/io_files/io_files/4_4_fugues/'
-	for sh in range(0):#,12):
-
+	for sh in range(1):#,12):
+		print '\n looking under:'.format(dirname)
+		print 'shifting up {}:'.format(sh)
 		pitch_matrix = []
 		for f_no, f in enumerate(retrieve_all_io_files(dirname)): 
-			print '\nshifting up {}, f_no {}'.format(f_no, sh)
+			print '\tf_no {} === {}'.format(f_no, f)
 			time_series_list = time_series_list_builder(dirname + f)
 			if sh > 0:
 				time_series_list = transpose_up_1_fret(time_series_list)
@@ -401,8 +404,8 @@ if __name__ == '__main__':
 		
 	pitch_matrix = clip_pitch_matrix(pitch_matrix)
 		
-	#pickle.dump(pitch_matrix, open('pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p', 'wb'))
-	#print 'save: pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p\n'
+	pickle.dump(pitch_matrix, open('pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p', 'wb'))
+	# print 'save: pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p\n'
 	# # pitch_matrix = pickle.load(open('training_data/pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p', 'rb'))
 	
 	

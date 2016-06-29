@@ -183,15 +183,15 @@ def make_monophonic(pitch_matrix):
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
    \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
 
-def make_time_series(pitch_matrix):
-
+def make_time_series(pitch_matrix, lowest_pitch=24):
+	
 	bar = 96/4
 	dir = 'Synthesized_Fugues/'
 	time_series = []
 	for t_step, vec in enumerate(pitch_matrix):
 		for pitch, key in enumerate(vec):
 			if key == 1:
-				time_series.append((t_step*bar, pitch, bar))
+				time_series.append((t_step*bar, pitch+lowest_pitch, bar))
 		
 	return time_series
 
@@ -206,8 +206,10 @@ def time_series_legato(time_series):
 	
 	This only works for monophonic time_series
 	'''
+	
 	pitch_previous = -1
 	new_time_series = []
+	
 	for (time, pitch, duration) in time_series:
 		if pitch == pitch_previous:
 			new_time_series.pop()
