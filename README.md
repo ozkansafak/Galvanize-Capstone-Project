@@ -1,4 +1,4 @@
->*<sup>The following is a project development daily journal.
+ =100>*<sup>The following is a project development daily journ =100x20al.
 It comprises of notes, thoughts and findings accompanying my work.
 It is to be replaced by a proper README file at the end of the project. </sup>*
 
@@ -431,7 +431,7 @@ MIDI output saved at
 ![rnn_param_defns](Source_Code/png_files/rnn_param_defns.png)  
 ![rnn_training_tensor](Source_Code/png_files/rnn_training_tensor.png)  
 
-.
+
 
 
 
