@@ -19,8 +19,8 @@ Y = None
 SEQUENCE_LENGTH = 48
 BATCH_SIZE = 48
 LEARNING_RATE = .01
-NUM_EPOCHS = 100000
-PRINT_FREQ = 30
+NUM_EPOCHS = 10000
+PRINT_FREQ = 1
 THRESHOLD = .5
 # D = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 data_size = None
@@ -37,9 +37,9 @@ pitch_matrix = flatten_pitch_matrix(pitch_matrix)
 NUM_FEATURES = pitch_matrix.shape[1]  # 63
 
 # extract the lowest notes  only
-pitch_matrix = make_monophonic(pitch_matrix) 
+# pitch_matrix = make_monophonic(pitch_matrix) 
 
-# pitch_matrix = pitch_matrix[:4800] # clip to test the code.
+pitch_matrix = pitch_matrix[:4800] # clip pitch_matrix to test the code.
 
 # def pad_pitch_matrix(pitch_matrix):
 # 	# make data_size % batch_size = 0
@@ -50,15 +50,19 @@ pitch_matrix = make_monophonic(pitch_matrix)
 # 	
 # 	return pitch_matrix
 # pitch_matrix = pad_pitch_matrix(pitch_matrix)
-xtra = (pitch_matrix.shape[0] - SEQUENCE_LENGTH) % BATCH_SIZE
-pitch_matrix = pitch_matrix[ 0 : pitch_matrix.shape[0] - xtra]
+
+'''   '''
+# xtra = (pitch_matrix.shape[0] - SEQUENCE_LENGTH) % BATCH_SIZE
+# pitch_matrix = pitch_matrix[ 0 : pitch_matrix.shape[0] - xtra]
+'''   '''
 
 data_size = pitch_matrix.shape[0] - SEQUENCE_LENGTH
 print '\n\t-----------------------------'
 print '\tpitch_matrix.shape[0] = {}'.format(pitch_matrix.shape[0])
 print '\tdata_size = {}'.format(data_size)
 print '\tSEQUENCE_LENGTH = {}'.format(SEQUENCE_LENGTH)
-print '\tBATCH_SIZE = {}'.format(BATCH_SIZE)
+print '\tBATCH_SIZE = {}'.format(BATCH_SIZE) 
+print '\tPRINT_FREQ = {}'.format(PRINT_FREQ)
 print '\tNUM_FEATURES = {}'.format(NUM_FEATURES)
 print '\tNUM_EPOCHS = {}'.format(NUM_EPOCHS)
 print '\t-----------------------------\n'
@@ -77,9 +81,8 @@ def generate_a_fugue(epoch, cost, N=96/4*16*2):
 	fugue = np.zeros((N, NUM_FEATURES))
 	
 	# x, _ = make_batch(p, pitch_matrix, 1)
-	x, _ = make_batch(0, X, Y, 1)
+	x, _ = make_batch(2000, X, Y, 1)
 	print "generate_a_fugue(epoch={})".format(epoch)
-	counter = 0
 	for i in range(N):
 		'''
 		Pick the single note that got assigned the highest probability.
@@ -89,9 +92,9 @@ def generate_a_fugue(epoch, cost, N=96/4*16*2):
 		predict = probs(x)#.ravel()
 		ix = np.argmax(predict, axis=1)
 		fugue[i][ix] = 1 
-		x[:, 0:SEQUENCE_LENGTH-1, :] = x[:, 1:, :] 
-		x[:, SEQUENCE_LENGTH-1, :] = 0 
-		x[0, SEQUENCE_LENGTH-1, :] = fugue[i, :]
+		x[0, 0:SEQUENCE_LENGTH-1, :] = x[:, 1:, :] 
+		x[0, SEQUENCE_LENGTH-1, :] = 0 
+		x[0, SEQUENCE_LENGTH-1, :] = fugue[i, :] 
 
 		# probs(x).shape:  (1, 73)
 		# print 'probs(x).shape: ', probs(x).shape 
@@ -110,7 +113,8 @@ def generate_a_fugue(epoch, cost, N=96/4*16*2):
 		# x[0, SEQUENCE_LENGTH-1, :] = fugue[i, :] 
 		
 	print_epoch = "%04d" % (epoch,)
-	filename =  'fugue_N' + str(N)+ '_epoch' + print_epoch
+	filename_f =  'fugue_N' + str(N)+ '_epoch' + print_epoch
+	filename_t =  'train_N' + str(N)+ '_epoch' + print_epoch
 	dump_dict = {'NUM_FEATURES' : NUM_FEATURES,
 				'SEQUENCE_LENGTH' : SEQUENCE_LENGTH,
 				'BATCH_SIZE' : BATCH_SIZE,
@@ -121,19 +125,18 @@ def generate_a_fugue(epoch, cost, N=96/4*16*2):
 				'cost' : cost,
 				'fugue' : fugue}
 				
-	pickle.dump(dump_dict, open('Synthesized_Fugues/'+filename+'.p', 'wb'))
+	pickle.dump(dump_dict, open('Synthesized_Fugues/'+filename_f+'.p', 'wb'))
 	time_series = pitch_matrix_TO_time_series(fugue)
 	time_series = time_series_legato(time_series)
 	
 	if len(time_series) > 0:
-		print 'len(time_series)', len(time_series)
+		print 'len(time_series)={}, N={} 16th notes'.format(len(time_series),N)
 
 		time_series = time_series_legato(time_series)
-		
-		time_series_TO_midi_file(time_series, 'Synthesized_Fugues/'+filename+'.mid')
+		time_series_TO_midi_file(time_series, 'Synthesized_Fugues/'+filename_f+'.mid')
+		# pickle.dump(train,     open('Synthesized_Fugues/'+filename_t+'.p', 'wb'))
 	else:
 		print 'NO NOTE PREDICTED'
-	print 'counter =', counter
 	return
 	
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
@@ -273,8 +276,7 @@ dummy_previous = -1
 for it in xrange(data_size * NUM_EPOCHS / BATCH_SIZE):
 	epoch = float(it)*float(BATCH_SIZE)/data_size
 	if p  > data_size - 1:
-		print '\nEpoch completed. epoch={}'.format(epoch)
-	 	print 'Resetting p-index, it={}, p={}'.format(it, p)
+		print '\nEpoch completed. epoch={}, it={}, p={}'.format(epoch,it, p)
 		cost.append(avg_cost)
 		p = 0
 		avg_cost = 0
@@ -297,7 +299,7 @@ for it in xrange(data_size * NUM_EPOCHS / BATCH_SIZE):
 		# Generate a fugue starting from a segment of length 
 		# SEQUENCE_LENGTH starting at the p-th note of pitch_matrix 
 		print "fugue generation completed in {} sec".format(round(t5-t4, 2))
-		print "\t\tTOTAL RUN TIME: {} sec".format(round(t5-t0, 2))
+		print "\t\t\t\tTOTAL RUN TIME: {} sec".format(round(t5-t0, 2))
 		print("Epoch {} average loss = {}".format(epoch, avg_cost / PRINT_FREQ))
 	pass
 	
@@ -307,7 +309,6 @@ for it in xrange(data_size * NUM_EPOCHS / BATCH_SIZE):
 
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
-# print 'RNN Model Trained until it={}, epoch={}'.format(it,  it*BATCH_SIZE/data_size)
 
 
 
