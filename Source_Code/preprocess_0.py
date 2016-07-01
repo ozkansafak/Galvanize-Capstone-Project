@@ -44,8 +44,8 @@ def plot_pitch_matrix(pitch_matrix, title=None, xlabel=None, ylabel=None):
 	ax.set_ylim([0, pitch_matrix.shape[0]])
 	
 	
-	#plt.ion()
-	#plt.show()
+	plt.ion()
+	plt.show()
 	
 	
 	
@@ -253,7 +253,7 @@ def extract_chord_sequence(time_series_list, bar=96):
 
 	return chord_sequence
 		
-def extract_pitch_matrix(time_series_list, bar=96):
+def time_series_list_TO_pitch_matrix(time_series_list, bar=96):
 	start_time, end_time = extract_end_start_times(time_series_list, bar)
 
 	time_sequence = range(start_time, end_time, bar)
@@ -370,8 +370,6 @@ def clip_pitch_matrix(pitch_matrix):
 	
 	
 	
-	
-	
 if __name__ == '__main__':
 	'''
 	INPUT: filename STR 
@@ -399,7 +397,7 @@ if __name__ == '__main__':
 			time_series_list = time_series_list_builder(dirname + f)
 			if sh > 0:
 				time_series_list = transpose_up_1_fret(time_series_list)
-			p = extract_pitch_matrix(time_series_list, bar=bar)[lowest_pitch:highest_pitch+1, :]
+			p = time_series_list_TO_pitch_matrix(time_series_list, bar=bar)[lowest_pitch:highest_pitch+1, :]
 			pitch_matrix.append(p)
 		
 	pitch_matrix = clip_pitch_matrix(pitch_matrix)

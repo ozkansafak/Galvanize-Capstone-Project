@@ -429,6 +429,7 @@ MIDI output saved at
 	- Legato: successive notes of same pitch must be continuously played.
     - octave shift: The training data was shifted down by 2 octaves
 
+
 ![rnn_param_defns](Source_Code/png_files/rnn_param_defns.png)  
 
 
@@ -436,18 +437,62 @@ The illustration for the `pitch_matrix` (on the left) and the `X` matrix.
 - `pitch_matrix` is comprised of all fugues appended together. (shape: `N`-by-`NUM_FEATURES`)  
 - `X` is a 3D tensor of data points, (shape:`data_size`-by-`SEQUENCE_LENGTH`-by-`NUM_FEATURES`, where `data_size = N - SEQUENCE_LENGTH`)  
 - `Y`  is a 2D tensor of corresponding target 2D tensor (shape:`data_size`-by-`NUM_FEATURES`  
-  
+
+the data points will be collected from `X` and `Y` in small batches of size `BATCH_SIZE`.
+Preferably. `data_size % BATCH_SIZE = 0` so there won't be any left overs at the last iteration of each epoch.
+
+
+
 ![rnn_training_tensor](Source_Code/png_files/rnn_training_tensor.png)  
 
 ---
 
-##### *June 27, 2016 - Wednesday*
+##### *June 29, 2016 - Wednesday*
 
 Command to see Disk Usage on ssh: `df -h .`   
 
 * code cleanup
-* 	- Work with classes and objects.   
+* Work with classes and objects.
 	- Attach appropriate functions to `pitch_matrix` and `time_series` objects. 
-    
-    
+* define a new function that computes data-matrix `X` and target-matrix `Y` 
+once and for all, then take batches from it.  
+    - `X,Y = make_X_Y(pitch_matrix)`     
+	- `x,y = make_batch(X, Y)`
 
+---
+
+##### *June 30, 2016 - Thursday*
+Last night and today, I've been cleaning up the code. But 
+the `main.py` is not running properly. Function `generate_a_fugue()` 
+gives me the same note prediction at each epoch. Need to correct
+this and re-run the model 1. with monophonic data, and 2. with 
+the unmodified data.
+
+* some function names changed:
+	- `time_series_list_TO_pitch_matrix`  
+	- `pitch_matrix_TO_time_series()`  
+	- `time_series_TO_midi_file()`  
+* Cost function is decreasing but the generated fugues are 
+solely comprised of a single note.
+* then pickle the mid-training data, particularly the 
+`train` variable.
+* Modify `time_series_legato()` so it works on a polyphonic
+`time_series`. Do it by first making an accompanying `pitch_matrix`
+
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.  
+.  
