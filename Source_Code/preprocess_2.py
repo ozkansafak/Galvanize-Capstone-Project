@@ -1,4 +1,4 @@
-import numpy as np	
+import numpy as np
 D = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
 

@@ -2,4 +2,6 @@
 /Source_Code/*.pyc
 /Source_Code/*.p
 /Source_Code/training_data/*.p
+/Source_Code/Sytnthesized_Fugues/new/*.wav
+/Source_Code/Sytnthesized_Fugues/*.wav
 .DS_Store

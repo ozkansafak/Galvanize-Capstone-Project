@@ -479,6 +479,53 @@ solely comprised of a single note.
 * Modify `time_series_legato()` so it works on a polyphonic
 `time_series`. Do it by first making an accompanying `pitch_matrix`
 
+---
+
+* Haven't been able to successfully save the `train` object. Pickling gave me an error -- 
+I don't remember now. Could try saving the params only.
+* The model has been predicting one note. I looked at the code. It doesn't seem to have a bug in it.
+It must be the parameters like `SEQUENCE_LENGTH` and `BATCH_SIZE` etc that's effecting the 
+learning. The cost has consistently been coming down, though.
+
+### `fugue_N768epoch180.mid` for monophonic and  
+### `fugue_N768epoch311.mid` for polyphonic models 
+### sound decent and shows hints of learning. They have a date tag of June 28th.
+
+---
+
+##### *July 1, 2016 - Friday*
+Pulling an all-nighter.
+
+model is training under `pitch_matrix[:4800]` with   
+``` python
+data_size = 4784
+SEQUENCE_LENGTH = 16
+BATCH_SIZE = 48
+LEARNING_RATE = .01
+GRAD_CLIPPING = 10
+```
+I also wrapped all np.array assignments in an `np.copy()` like this:
+```
+x = np.copy(X[p : p+batch_size])
+y = np.copy(Y[p : p+batch_size])
+```
+
+I produced 2 awesome sounding monophonic songs, premature convergence and with only 4784 data points. 
+
+`x, _ = make_batch(data_size/1*3, X, Y, 1)`  
+  
+* make the training data super clean and consistent and in perfect 16ths or above.
+    
+##### *July 2, 2016 - Saturday*
+
+I realized I could install `ipython` on my AWS instance. I need to start it as `sudo ipyton`
+and then I can import all the modules I want
+
+
+
+
+
+
 .  
 .  
 .  

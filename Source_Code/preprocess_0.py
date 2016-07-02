@@ -1,5 +1,6 @@
 from preprocess_2 import *
 from preprocess_1 import *
+from preprocess_0 import plot_pitch_matrix
 
 import pickle
 import midi
@@ -9,6 +10,7 @@ import matplotlib.pylab as plt
 
 """	Stage 0: MIDI to time_series_list conversion
 """
+
 def plot_canonical_chords_vector():
 	v, c = build_chords_vocabulary()
  	column_labels = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
@@ -252,6 +254,8 @@ def extract_chord_sequence(time_series_list, bar=96):
 		print ''.join(chord_sequence[i][1])
 
 	return chord_sequence
+	
+
 		
 def time_series_list_TO_pitch_matrix(time_series_list, bar=96):
 	start_time, end_time = extract_end_start_times(time_series_list, bar)
@@ -278,8 +282,6 @@ def retrieve_all_io_files(dirname='../MIDI_data/io_files/io_files/'):
 	return io_files
 
 
-		
-
 
 
 
@@ -305,16 +307,6 @@ def get_bad_files():
 	return bad_files
 
 
-def main_pitch_matrix_generator():
-	'''
-	Generates the pitch_matrices for all io_files
-	
-	'''
-	
-	#retrieve all io_files
-	dir = retrieve_all_io_files(dirname='../MIDI_data/io_files/io_files/4_4_fugues')
-	#....
-	
 
 def get_lo_hi_pitches(time_series_list):
 	
@@ -388,21 +380,21 @@ if __name__ == '__main__':
 	print 'in model.py, set NUM_FEATURES={}\n{}'.format(highest_pitch-lowest_pitch+1, '-'*30)
 	
 	dirname = '../MIDI_data/io_files/io_files/4_4_fugues/'
-	for sh in range(1):#,12):
-		print '\n looking under:'.format(dirname)
-		print 'shifting up {}:'.format(sh)
+	for sh in range(1):
+		print_sh = "%02d" % (sh,)
+		print '\nLooking under: {}'.format(dirname)
+		print 'Shifting up. sh={}:'.format(sh)
 		pitch_matrix = []
 		for f_no, f in enumerate(retrieve_all_io_files(dirname)): 
-			print '\tf_no {} === {}'.format(f_no, f)
+			print '\tf_no {} --- {}'.format(f_no, f)
 			time_series_list = time_series_list_builder(dirname + f)
 			if sh > 0:
 				time_series_list = transpose_up_1_fret(time_series_list)
 			p = time_series_list_TO_pitch_matrix(time_series_list, bar=bar)[lowest_pitch:highest_pitch+1, :]
 			pitch_matrix.append(p)
 		
-	pitch_matrix = clip_pitch_matrix(pitch_matrix)
 		
-	pickle.dump(pitch_matrix, open('pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p', 'wb'))
+	pickle.dump(pitch_matrix, open('training_data/pitch_matrix_'+str(bar)+'ticks_sh'+str(print_sh)+'.p', 'wb'))
 	# print 'save: pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p\n'
 	# # pitch_matrix = pickle.load(open('training_data/pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p', 'rb'))
 	
@@ -421,7 +413,6 @@ if __name__ == '__main__':
 	# 	if k <= 96*8:
 	# 		print ' ', k, '\t:' , v
 		
-	
 	
 	if False: 
 		# plot the pitch_matrices and save 
