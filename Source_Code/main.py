@@ -5,12 +5,10 @@ from lasagne.layers import InputLayer, RecurrentLayer, LSTMLayer, DenseLayer, ge
 from lasagne.updates import adagrad
 from lasagne.nonlinearities import sigmoid
 from lasagne.objectives import binary_crossentropy, aggregate
-
 import numpy as np
 import pickle
 import time
 from helpers_to_main import *
-
 
 # Declare Global Variables
 NUM_FEATURES = None
@@ -23,11 +21,9 @@ NUM_EPOCHS = 5000
 PRINT_FREQ = 30
 GRAD_CLIPPING = 100
 THRESHOLD = .5
-
-# D = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 data_size = None
-# # # # # # # # # # # # # # 
-
+# 
+# 
 t0 = time.time()
 print "\nLoading pitch_matrix ..."
 sh = 0
@@ -37,12 +33,12 @@ pitch_matrix = pickle.load(open('training_data/pitch_matrix_'+str(96/4)+'ticks_s
 # into a single 2D numpy array and transpose it.
 pitch_matrix = flatten_pitch_matrix(pitch_matrix)
 NUM_FEATURES = pitch_matrix.shape[1]  # 63
-
+# 
 # extract the lowest notes  only
 pitch_matrix = make_monophonic(pitch_matrix) 
-
-pitch_matrix = pitch_matrix[:] # clip pitch_matrix to test the code.
-
+# clip pitch_matrix for testing purposes.
+pitch_matrix = pitch_matrix[:4000] 
+#
 '''   '''
 # xtra = (pitch_matrix.shape[0] - SEQUENCE_LENGTH) % BATCH_SIZE
 # pitch_matrix = pitch_matrix[ 0 : pitch_matrix.shape[0] - xtra]
@@ -65,14 +61,14 @@ print '\t-----------------------------\n'
 def generate_a_fugue(epoch, cost, N=16*32):
 	'''
 	INPUT:  epoch and cost: Passed just for naming of the output files.	
-			N: How many steps the fugue will be generated for.
-			96/4 is the number of 16th notes in one bar
+			N: How many steps the fugue will be generated for. 
+			96/4 is the number of 16th notes in one bar 
 	'''
 	#
-	# Advance the RNN model for N steps.
+	# Advance the RNN model for N steps at its current state.
 	fugue = np.zeros((N, NUM_FEATURES))
 	#
-	x, _ = make_batch(data_size/3, X, Y, 1)
+	x, _ = make_batch(data_size/3, X, Y, data_size, 1)
 	print "generate_a_fugue(epoch={})".format(epoch)
 	for i in range(N):
 		'''
@@ -119,43 +115,6 @@ def generate_a_fugue(epoch, cost, N=16*32):
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
    \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
-def make_X_Y(pitch_matrix, sequence_length=SEQUENCE_LENGTH, num_features=NUM_FEATURES):
-	
-	X = np.zeros((data_size, sequence_length, num_features))
-	Y = np.zeros((data_size, num_features))
-	
-	for i in range(data_size):
-		X[i, : , :] = pitch_matrix[i : i+sequence_length, :]
-		Y[i, :] = pitch_matrix[i+sequence_length]
-
-	return X, Y
-	
-
-def make_batch(p, X, Y, batch_size=BATCH_SIZE):
-	if p+batch_size-1 <= data_size-1:
-		x = X[p : p+batch_size]
-		y = Y[p : p+batch_size]
-	else:
-		# p = 11; batch_size = 6; data_size = 15
-		# next batch: [11,12,13,14,15,16]
-		# leftOver = 2
-		leftOver = (p+batch_size-1) % (data_size-1)
-		print "make_batch(): Broken batch. leftOver=", leftOver, "\r",
-
-		x = X[p:]
-		y = Y[p:]
-		# reset p
-		x1 = X[:leftOver]
-		y1 = Y[:leftOver]
-		#
-		x = np.concatenate((x,x1), axis=0)
-		y = np.concatenate((y,y1), axis=0)
-		#
-	return x, y
-
-'''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
-   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
-   \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
 
 def build_rnn(sequence_length=SEQUENCE_LENGTH, num_units=512):
 	# input layer
@@ -167,8 +126,7 @@ def build_rnn(sequence_length=SEQUENCE_LENGTH, num_units=512):
 	l_out = DenseLayer(l_LSTM, num_units=NUM_FEATURES, nonlinearity=sigmoid)
 	return l_in, l_out
 	
-'''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
-   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
+'''||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
    \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
 
 def total_cost(predictions, target):
@@ -180,9 +138,7 @@ def total_cost(predictions, target):
 	chord_cost = 0
 	return note_cost + chord_cost
 	
-'''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
-   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
-   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||
+'''||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||
    \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
 
 print "Building network ..."
@@ -220,16 +176,15 @@ probs = theano.function([l_in.input_var], network_output, allow_input_downcast=T
 		T  R  A  I  N  I  N  G  --  T  R  A  I  N  I  N  G  --  T  R  A  I  N  I  N  G												
 '''
 # make the training data tensors X and Y, and train the model on them
-X, Y = make_X_Y(pitch_matrix)
-
 print "Training ..."
+X, Y = make_X_Y(pitch_matrix, data_size, SEQUENCE_LENGTH, NUM_FEATURES)
 p, avg_cost, dummy_previous, cost = 0, 0, -1, []
 
 for it in xrange(data_size * NUM_EPOCHS / BATCH_SIZE):
 	epoch = float(it) * float(BATCH_SIZE) / data_size
-	print "it:", it, "--- epoch:", round(epoch,3), "\r",
+	print "it:", it, "--- epoch:", round(epoch,3), "                   \r",
 	
-	x, y = make_batch(p, X, Y)
+	x, y = make_batch(p, X, Y, data_size, BATCH_SIZE)
 	avg_cost = avg_cost + train(x, y)
 	
 	if epoch % PRINT_FREQ < dummy_previous:

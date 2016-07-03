@@ -1,10 +1,43 @@
 import numpy as np	
 import midi
-D = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
+def make_X_Y(pitch_matrix, data_size, sequence_length, num_features):
+	
+	X = np.zeros((data_size, sequence_length, num_features))
+	Y = np.zeros((data_size, num_features))
+	
+	for i in range(data_size):
+		X[i, : , :] = pitch_matrix[i : i+sequence_length, :]
+		Y[i, :] = pitch_matrix[i+sequence_length]
 
-'''||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||
-   \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
+	return X, Y
+	
+
+def make_batch(p, X, Y, data_size, batch_size):
+	if p+batch_size-1 <= data_size-1:
+		x = X[p : p+batch_size]
+		y = Y[p : p+batch_size]
+	else:
+		# p = 11; batch_size = 6; data_size = 15
+		# next batch: [11,12,13,14,15,16]
+		# leftOver = 2
+		leftOver = (p+batch_size-1) % (data_size-1)
+		print "make_batch(): Broken batch. leftOver=", leftOver, "\r",
+
+		x = X[p:]
+		y = Y[p:]
+		# reset p
+		x1 = X[:leftOver]
+		y1 = Y[:leftOver]
+		#
+		x = np.concatenate((x,x1), axis=0)
+		y = np.concatenate((y,y1), axis=0)
+		#
+	return x, y
+
+'''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
+   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
+   \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
 
 def flatten_pitch_matrix(pitch_matrix):
 	'''
