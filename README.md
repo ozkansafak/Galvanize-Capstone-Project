@@ -521,8 +521,20 @@ I produced 2 awesome sounding monophonic songs, premature convergence and with o
 I realized I could install `ipython` on my AWS instance. I need to start it as `sudo ipyton`
 and then I can import all the modules I want
 
-
-
+I added this to my .bash_profile. It's so handy
+``` bash
+alias scpget='scp g2:Source_Code/Synthesized_Fugues/* ~/Bach2.0/Source_Code/Synthesized_Fugues/new/'
+alias scppush='scp ~/Bach2.0/Source_Code/*py g2:Source_Code/'
+```
+* After sleeping for 10 hours today, I was able to fix the bug in `main.py`
+* 
+```python
+SEQUENCE_LENGTH = 16
+BATCH_SIZE = 16
+data_size = 4784
+```
+has converged well but the music sounds bad. I'll try longer `SEQUENCE_LENGTH` and 
+`BATCH_SIZE` parameters.
 
 
 

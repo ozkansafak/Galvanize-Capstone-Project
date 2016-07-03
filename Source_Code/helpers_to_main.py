@@ -6,33 +6,15 @@ D = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 '''||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||
    \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
 
-
-'''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
-   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
-
-# def make_X_Y(pitch_matrix, sequence_length, num_features):
-# 
-# 	X = np.zeros((data_size, sequence_length, num_features))
-# 	Y = np.zeros((data_size, num_features))
-# 
-# 	for i in range(data_size):
-# 		X[i, : , :] = pitch_matrix[i : i+sequence_length, :]
-# 		Y[i, :] = pitch_matrix[i+sequence_length]
-# 
-# 	return X, Y
-# 
-# def make_batch(p, X, Y, batch_size):
-# 
-# 	x = X[p : p+batch_size]
-# 	y = Y[p : p+batch_size]
-# 	return x, y
-
-
-
 def flatten_pitch_matrix(pitch_matrix):
 	'''
 	INPUT: list of 2d np.arrays 
 	OUTPUT: 2d np.array 
+	
+	# patch the individual pitch_matrices of individual fugues
+	# into a single 2D numpy array.
+	# Transpose it, then return it.
+	
 	'''
 	# flatten pitch_matrix
 	pitch_matrix_long = pitch_matrix[0]
@@ -45,8 +27,7 @@ def flatten_pitch_matrix(pitch_matrix):
 	return pitch_matrix
 
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
-   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
-   \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
+   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
 
 def make_monophonic(pitch_matrix):
 	'''
@@ -65,12 +46,11 @@ def make_monophonic(pitch_matrix):
 	return pitch_matrix
 
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
-   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
-   \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
+   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
 
 def pitch_matrix_TO_time_series_legato(pitch_matrix, bar=96/4, sh=0):
 	
-	""" This seems work right """
+	""" This seems to work right """
 	time_series = []
 	for pitch, row in enumerate(pitch_matrix):
 		i = 0	
@@ -80,7 +60,7 @@ def pitch_matrix_TO_time_series_legato(pitch_matrix, bar=96/4, sh=0):
 				while i < len(row) and row[i] == 1:
 					c+=1
 					i+=1
-				time_series.append(((i-c)*bar, pitch+24, c*bar))
+				time_series.append(((i-c)*bar, pitch+sh, c*bar))
 				i -= 1
 			i += 1
 	
@@ -88,8 +68,7 @@ def pitch_matrix_TO_time_series_legato(pitch_matrix, bar=96/4, sh=0):
 	return time_series	
 
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
-   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
-   \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
+   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
 
 def time_series_TO_midi_file(time_series, filename="Synthesized_Fugues/out.mid"):
 	'''
@@ -130,7 +109,7 @@ def time_series_TO_midi_file(time_series, filename="Synthesized_Fugues/out.mid")
 
 
 '''||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
-   \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
+   \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/ '''
 
 
 

@@ -1,6 +1,5 @@
 from preprocess_2 import *
 from preprocess_1 import *
-from preprocess_0 import plot_pitch_matrix
 
 import pickle
 import midi
@@ -48,10 +47,7 @@ def plot_pitch_matrix(pitch_matrix, title=None, xlabel=None, ylabel=None):
 	
 	plt.ion()
 	plt.show()
-	
-	
-	
-	
+
 	
 def extract_melody(track):
 	'''
@@ -394,9 +390,9 @@ if __name__ == '__main__':
 			pitch_matrix.append(p)
 		
 		
-	pickle.dump(pitch_matrix, open('training_data/pitch_matrix_'+str(bar)+'ticks_sh'+str(print_sh)+'.p', 'wb'))
+	pickle.dump(pitch_matrix, open('training_data/pitch_matrix_'+str(bar)+'ticks_sh'+print_sh+'.p', 'wb'))
 	# print 'save: pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p\n'
-	# # pitch_matrix = pickle.load(open('training_data/pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p', 'rb'))
+	# # pitch_matrix = pickle.load(open('training_data/pitch_matrix_'+str(bar)+'ticks_sh'+print_sh+'.p', 'rb'))
 	
 	
 	# l = note_value(time_series_list)
@@ -419,22 +415,13 @@ if __name__ == '__main__':
 		
 		f = retrieve_all_io_files(dirname='../MIDI_data/io_files/io_files/4_4_fugues/')
 		for i, pm in enumerate(pitch_matrix):
-			# if (f[i] == 'bwv653_io.mid') or (f[i] == 'bwv552f_io.mid'):
-				plt.close('all')
-				print 'plotting {} {}'.format(i, f[i][:-7])
-				plot_pitch_matrix(pm, title='{} pitch_matrix'.format(f[i][:-7]), \
-					xlabel='{}-tick increments'.format(bar), \
-					ylabel='midi notes: {}-{}'.format(lowest_pitch, highest_pitch))
-				plt.savefig('{}--{}'.format(f[i][:-7],'pitch_matrix.png'))
-		
+			plt.close('all')
+			print 'plotting {} {}'.format(i, f[i][:-7])
+			plot_pitch_matrix(pm, title='{} pitch_matrix'.format(f[i][:-7]), \
+				xlabel='{}-tick increments'.format(bar), \
+				ylabel='midi notes: {}-{}'.format(lowest_pitch, highest_pitch))
+			plt.savefig('{}--{}'.format(f[i][:-7],'pitch_matrix.png'))
 	
-	# chord_sequence = extract_chord_sequence(time_series_list, bar=96*4)
-	
-	
-
-
-
-
 
 
 

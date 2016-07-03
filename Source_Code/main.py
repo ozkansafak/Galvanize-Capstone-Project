@@ -16,8 +16,8 @@ from helpers_to_main import *
 NUM_FEATURES = None
 X = None
 Y = None
-SEQUENCE_LENGTH = 32
-BATCH_SIZE = 16
+SEQUENCE_LENGTH = 16
+BATCH_SIZE = 100
 LEARNING_RATE = .01
 NUM_EPOCHS = 5000
 PRINT_FREQ = 30
@@ -41,7 +41,7 @@ NUM_FEATURES = pitch_matrix.shape[1]  # 63
 # extract the lowest notes  only
 pitch_matrix = make_monophonic(pitch_matrix) 
 
-pitch_matrix = pitch_matrix[:4800] # clip pitch_matrix to test the code.
+pitch_matrix = pitch_matrix[:] # clip pitch_matrix to test the code.
 
 '''   '''
 # xtra = (pitch_matrix.shape[0] - SEQUENCE_LENGTH) % BATCH_SIZE
@@ -85,15 +85,14 @@ def generate_a_fugue(epoch, cost, N=16*32):
 		#
 		fugue[i][ix] = 1 
 		x[0, :-1, :] = x[:, 1:, :] 
-		# x[0, SEQUENCE_LENGTH-1, :] = 0 # unnecessary line
-		x[0, SEQUENCE_LENGTH-1, :] = fugue[i, :] 
+		x[0, -1, :] = fugue[i, :] 
 		#
 		# # # # # # # # # # # # # # # # # # 
 	#
 	print_epoch = "%04d" % (epoch,)
 	print_data_size = "%05d" % (data_size,)
 	print_SEQL = "%02d" % (SEQUENCE_LENGTH,)
-	filename =  'fugue_dataSize' + print_data_size + \
+	filename =  'fugue_dsize' + print_data_size + \
 					'_SEQL' + print_SEQL + \
 					'_epoch' + print_epoch
 					
@@ -108,13 +107,13 @@ def generate_a_fugue(epoch, cost, N=16*32):
 				'fugue' : fugue}
 	#
 	pickle.dump(dump_dict, open('Synthesized_Fugues/'+filename+'.p', 'wb'))
-	time_series = pitch_matrix_TO_time_series_legato(np.transpose(fugue))
+	time_series = pitch_matrix_TO_time_series_legato(np.transpose(fugue), sh=24)
 	#
+	print 'N={}, len(time_series)={}'.format(N, len(time_series))
 	if len(time_series) > 0:
-		print 'N={}, len(time_series)={}'.format(N, len(time_series))
 		time_series_TO_midi_file(time_series, 'Synthesized_Fugues/'+filename+'.mid')
-	else:
-		print 'NO NOTE PREDICTED'
+	elif len(time_series) <= 1:
+		print 'ONE OR ZERO NOTE PREDICTED'
 	return
 	
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
@@ -141,7 +140,8 @@ def make_batch(p, X, Y, batch_size=BATCH_SIZE):
 		# next batch: [11,12,13,14,15,16]
 		# leftOver = 2
 		leftOver = (p+batch_size-1) % (data_size-1)
-		print "\nmake_batch(): Broken batch. leftOver={}".format(leftOver)
+		print "make_batch(): Broken batch. leftOver=", leftOver, "\r",
+
 		x = X[p:]
 		y = Y[p:]
 		# reset p
@@ -227,13 +227,12 @@ p, avg_cost, dummy_previous, cost = 0, 0, -1, []
 
 for it in xrange(data_size * NUM_EPOCHS / BATCH_SIZE):
 	epoch = float(it) * float(BATCH_SIZE) / data_size
-	print "it:", it, "--- epoch:", round(epoch,3), "\r     ",
+	print "it:", it, "--- epoch:", round(epoch,3), "\r",
 	
 	x, y = make_batch(p, X, Y)
 	avg_cost = avg_cost + train(x, y)
 	
 	if epoch % PRINT_FREQ < dummy_previous:
-
 		generate_a_fugue(epoch=epoch, cost=cost) 
 		t5 = time.time()
 		# Generate a fugue starting from a segment of length 
