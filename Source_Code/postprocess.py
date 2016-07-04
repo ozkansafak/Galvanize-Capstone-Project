@@ -54,7 +54,7 @@ if __name__ == '__main__':
 		epoch.append(int(fname.split('epoch')[1].split('.')[0]))
 		
 	ind = np.argmax(epoch)
-	ind = [i for i,elem in enumerate(epoch) if elem == 1650][0]
+	ind = [i for i,elem in enumerate(epoch) if elem == 00][0]
 	last_epoch_filepath = dirpath + p_files[ind]
 	cost, fugue = extract_from_pickle(last_epoch_filepath)
 	fugue = np.transpose(fugue)

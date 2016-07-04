@@ -1,5 +1,5 @@
- =100>*<sup>The following is a project development daily journ =100x20al.
-It comprises of notes, thoughts and findings accompanying my work.
+*<sup>The following is a project development daily journal
+comprised of notes and findings accompanying my work.
 It is to be replaced by a proper README file at the end of the project. </sup>*
 
 ---
@@ -527,14 +527,18 @@ alias scpget='scp g2:Source_Code/Synthesized_Fugues/* ~/Bach2.0/Source_Code/Synt
 alias scppush='scp ~/Bach2.0/Source_Code/*py g2:Source_Code/'
 ```
 * After sleeping for 10 hours today, I was able to fix the bug in `main.py`
-* 
+
 ```python
 SEQUENCE_LENGTH = 16
 BATCH_SIZE = 16
 data_size = 4784
 ```
-has converged well but the music sounds bad. I'll try longer `SEQUENCE_LENGTH` and 
+has converged well but the music doesn't sound too good. I'll try longer `SEQUENCE_LENGTH` and 
 `BATCH_SIZE` parameters.
+
+* the Code Calculates the `leftOver` parameter from the given `data_size` and 
+`pitch_matrix.shape[0]` and pads `pitch_matrix` with zeros so the last batch ends at the 
+last entry of `pitch_matrix`
 
 
 

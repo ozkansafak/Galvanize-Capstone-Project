@@ -3,7 +3,7 @@ import theano.tensor as T
 import lasagne
 from lasagne.layers import InputLayer, RecurrentLayer, LSTMLayer, DenseLayer, get_all_params
 from lasagne.updates import adagrad
-from lasagne.nonlinearities import sigmoid
+from lasagne.nonlinearities import sigmoid, tanh
 from lasagne.objectives import binary_crossentropy, aggregate
 import numpy as np
 import pickle
@@ -15,10 +15,10 @@ NUM_FEATURES = None
 X = None
 Y = None
 SEQUENCE_LENGTH = 16
-BATCH_SIZE = 100
+BATCH_SIZE = 16
 LEARNING_RATE = .01
 NUM_EPOCHS = 5000
-PRINT_FREQ = 30
+PRINT_FREQ = 100
 GRAD_CLIPPING = 100
 THRESHOLD = .5
 data_size = None
@@ -37,14 +37,15 @@ NUM_FEATURES = pitch_matrix.shape[1]  # 63
 # extract the lowest notes  only
 pitch_matrix = make_monophonic(pitch_matrix) 
 # clip pitch_matrix for testing purposes.
-pitch_matrix = pitch_matrix[:4000] 
+pitch_matrix = pitch_matrix[:4800] 
 #
 '''   '''
 # xtra = (pitch_matrix.shape[0] - SEQUENCE_LENGTH) % BATCH_SIZE
 # pitch_matrix = pitch_matrix[ 0 : pitch_matrix.shape[0] - xtra]
 '''   '''
-
 data_size = pitch_matrix.shape[0] - SEQUENCE_LENGTH
+pitch_matrix, data_size = adjust_pitch_matrix(pitch_matrix, data_size, BATCH_SIZE, NUM_FEATURES)
+#
 print '\n\t-----------------------------'
 print '\tpitch_matrix.shape[0] = {}'.format(pitch_matrix.shape[0])
 print '\tdata_size = {}'.format(data_size)
@@ -68,7 +69,7 @@ def generate_a_fugue(epoch, cost, N=16*32):
 	# Advance the RNN model for N steps at its current state.
 	fugue = np.zeros((N, NUM_FEATURES))
 	#
-	x, _ = make_batch(data_size/3, X, Y, data_size, 1)
+	x, _ = make_batch(1000, X, Y, data_size, 1)
 	print "generate_a_fugue(epoch={})".format(epoch)
 	for i in range(N):
 		'''
@@ -116,13 +117,19 @@ def generate_a_fugue(epoch, cost, N=16*32):
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
    \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
 
-def build_rnn(sequence_length=SEQUENCE_LENGTH, num_units=512):
+def build_rnn(sequence_length=SEQUENCE_LENGTH, num_units=128):
 	# input layer
 	# generate the data to pass into this
 	l_in = InputLayer(shape=(None, sequence_length, NUM_FEATURES))
 	# LSTM Layer
-	l_LSTM = LSTMLayer(l_in, num_units=num_units, grad_clipping=GRAD_CLIPPING, only_return_final=True)
+	l_LSTM1 = LSTMLayer(l_in, num_units=num_units, grad_clipping=GRAD_CLIPPING, nonlinearity=tanh)
 	# output layer
+	l_LSTM2 = LSTMLayer(l_LSTM1, num_units=num_units, grad_clipping=GRAD_CLIPPING, nonlinearity=tanh)
+	# output layer
+	l_LSTM3 = LSTMLayer(l_LSTM2, num_units=num_units, grad_clipping=GRAD_CLIPPING, nonlinearity=tanh)
+	# output layer
+	l_LSTM = LSTMLayer(l_LSTM3, num_units=num_units, grad_clipping=GRAD_CLIPPING, only_return_final=True, nonlinearity=tanh)
+	# outpt layer
 	l_out = DenseLayer(l_LSTM, num_units=NUM_FEATURES, nonlinearity=sigmoid)
 	return l_in, l_out
 	
@@ -135,8 +142,7 @@ def total_cost(predictions, target):
 	OUTPUT: 
 	'''
 	note_cost = binary_crossentropy(predictions, target).mean()
-	chord_cost = 0
-	return note_cost + chord_cost
+	return note_cost 
 	
 '''||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||
    \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
@@ -177,12 +183,15 @@ probs = theano.function([l_in.input_var], network_output, allow_input_downcast=T
 '''
 # make the training data tensors X and Y, and train the model on them
 print "Training ..."
+print 'pitch_matrix.shape', pitch_matrix.shape
 X, Y = make_X_Y(pitch_matrix, data_size, SEQUENCE_LENGTH, NUM_FEATURES)
+print 'pitch_matrix.shape', pitch_matrix.shape
+
 p, avg_cost, dummy_previous, cost = 0, 0, -1, []
 
 for it in xrange(data_size * NUM_EPOCHS / BATCH_SIZE):
 	epoch = float(it) * float(BATCH_SIZE) / data_size
-	print "it:", it, "--- epoch:", round(epoch,3), "                   \r",
+	print "it:", it, "--- epoch:", round(epoch,3), "   \r",
 	
 	x, y = make_batch(p, X, Y, data_size, BATCH_SIZE)
 	avg_cost = avg_cost + train(x, y)
@@ -208,8 +217,4 @@ for it in xrange(data_size * NUM_EPOCHS / BATCH_SIZE):
 	
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
-
-
-
-
 

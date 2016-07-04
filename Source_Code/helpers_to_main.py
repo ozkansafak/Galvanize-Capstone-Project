@@ -1,8 +1,19 @@
 import numpy as np	
 import midi
 
+
+def adjust_pitch_matrix(pitch_matrix, data_size, batch_size, num_features):
+	p = (data_size / batch_size) * batch_size
+	leftOver = (p+batch_size) % (data_size)
+	if leftOver > 0:
+		print "adjust_pitch_matrix(): Broken batch. leftOver =", leftOver
+		pitch_matrix = np.concatenate((pitch_matrix,np.zeros((leftOver,num_features))), axis=0)
+		print 'adjust_pitch_matrix reports: pitch_matrix.shape =', pitch_matrix.shape
+
+	return pitch_matrix, data_size + leftOver
+
 def make_X_Y(pitch_matrix, data_size, sequence_length, num_features):
-	
+
 	X = np.zeros((data_size, sequence_length, num_features))
 	Y = np.zeros((data_size, num_features))
 	
@@ -18,11 +29,11 @@ def make_batch(p, X, Y, data_size, batch_size):
 		x = X[p : p+batch_size]
 		y = Y[p : p+batch_size]
 	else:
-		# p = 11; batch_size = 6; data_size = 15
-		# next batch: [11,12,13,14,15,16]
+		# p = 12; batch_size = 6; data_size = 16
+		# next batch: [12,13,14,15,16,17]
 		# leftOver = 2
-		leftOver = (p+batch_size-1) % (data_size-1)
-		print "make_batch(): Broken batch. leftOver=", leftOver, "\r",
+		leftOver = (p+batch_size) % (data_size)
+		print "\nmake_batch(): Broken batch. leftOver=", leftOver
 
 		x = X[p:]
 		y = Y[p:]
