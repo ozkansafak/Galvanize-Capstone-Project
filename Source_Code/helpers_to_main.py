@@ -67,14 +67,16 @@ def flatten_pitch_matrix(pitch_matrix):
 
 	# transpose it to swap the axes. 
 	# pitch_matrix.shape = (N, NUM_FEATURES)
-	pitch_matrix = np.transpose(pitch_matrix_long)	
-	return pitch_matrix
+	
+	return np.transpose(pitch_matrix_long)
 
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
 
 def make_monophonic(pitch_matrix):
 	'''
+	INPUT: 2D numpy array -- flattened pitch matrix sth-by-NUM_FEATURES
+	OUTPUT: 2D numpy array -- same shape
 	This is a preprocess step that's invoked in model.py on AWS
 	'''
 	# pitch_matrix is already flattened upon being loaded in model.py
@@ -93,10 +95,13 @@ def make_monophonic(pitch_matrix):
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
 
 def pitch_matrix_TO_time_series_legato(pitch_matrix, bar=96/4, sh=0):
-	
+	'''
+	INPUT: 2D numpy array (flattened. ie shape=sth-by-NUM_FEATURES)
+	OUTPUT: list of tuples [(time, pitch, duration), ...]
+	'''
 	""" This seems to work right """
 	time_series = []
-	for pitch, row in enumerate(pitch_matrix):
+	for pitch, row in enumerate(np.transpose(pitch_matrix)):
 		i = 0	
 		while i < len(row):
 			if row[i] == 1:
@@ -160,7 +165,7 @@ def time_series_TO_midi_file(time_series, filename="Synthesized_Fugues/out.mid")
 if __name__ == '__main__':
 	# time_series_list = time_series_list_builder(filepath)
 	pitch_matrix = time_series_list_TO_pitch_matrix(time_series_list)
-	time_series = pitch_matrix_TO_time_series_legato(pitch_matrix)
+	time_series = pitch_matrix_TO_time_series_legato(np.transpose(pitch_matrix))
 	time_series_TO_midi_file(time_series)
 	
 

@@ -233,7 +233,6 @@ def extract_pitches(time_series_list, time=96*4*10, bar=96):
 
 
 
-
 def extract_chord_sequence(time_series_list, bar=96):
     # INPUT : time_series_list [(time, pitch, duration)], 
     # OUTPUT: LIST of strings ['Am', 'GMaj aug', 'G7', 'Dm_harmonic', ...]
@@ -391,8 +390,7 @@ if __name__ == '__main__':
 		
 		
 	pickle.dump(pitch_matrix, open('training_data/pitch_matrix_'+str(bar)+'ticks_sh'+print_sh+'.p', 'wb'))
-	# print 'save: pitch_matrix_'+str(bar)+'ticks_sh'+str(sh)+'.p\n'
-	# # pitch_matrix = pickle.load(open('training_data/pitch_matrix_'+str(bar)+'ticks_sh'+print_sh+'.p', 'rb'))
+ 	# # pitch_matrix = pickle.load(open('training_data/pitch_matrix_'+str(bar)+'ticks_sh'+print_sh+'.p', 'rb'))
 	
 	
 	# l = note_value(time_series_list)

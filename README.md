@@ -369,7 +369,8 @@ You can exit safely and leave the job running.
 >- `exit`: exit out of AWS.
 >- Reconnect to AWS: `ssh g2`
 >- `tmux ls`: show all sessions running
->- `tmux attach`: reconnect to session
+>- `tmux attach -t 1`: reconnect to session 1
+>- `tmux attach`: reconnect to session (when there's only one session)
 >- `exit`: end the `tmux` session.
 
 ---
@@ -539,6 +540,25 @@ has converged well but the music doesn't sound too good. I'll try longer `SEQUEN
 * the Code Calculates the `leftOver` parameter from the given `data_size` and 
 `pitch_matrix.shape[0]` and pads `pitch_matrix` with zeros so the last batch ends at the 
 last entry of `pitch_matrix`
+
+* Can go thru the fugues and clean them up better. 
+* Ideally, each fugue must have a skip index (len(fugue)-batch_size) where, 
+the batch should be broken when it reaches the end of the fugue. Then, the batch
+should skip over to the next fugue. This can be done before `flatten_pitch_matrix()`
+is called.
+
+---
+
+##### *July 3, 2016 - Wednesday*
+
+I've been busy with the hiring day duties, and making up the presentation. 
+But in the meantime, I got to do a few run with 2 hidden layers.   
+
+FINDING: I accidentally left the `GRAD_CLIPPING` parameter at `1000`. The 
+cost function was reduced but the generated melody was only a single pitch.
+Now, I got to run it with 2 hidden layers and `GRAD_CLIPPING=10`. It already 
+is performing better at epoch 200 with a full melody produced. Code is running.
+
 
 
 
