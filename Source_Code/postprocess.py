@@ -44,17 +44,46 @@ def get_fugue_pickle_filepaths(dirpath):
 	
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
+
+def plot_predicts():
+	dirpath = '/Users/ozkansafak/Bach2.0/Source_Code/Synthesized_Fugues/new/'
+	p_files = get_fugue_pickle_filepaths(dirpath)
+
+	fig = plt.figure(figsize=(13,6))
+	ax = fig.gca()
+	ax.grid('on')
+	plt.show()
+	plt.ion()
+	c = ['ko', 'b', 'r*','c.']
+
+	#get all the epochs
+	epoch =[]
+	for fname in p_files:
+		epoch.append(int(fname.split('epoch')[1].split('.')[0]))
+
+	for i in range(len(p_files)):
+		ind = [j for j, elem in enumerate(epoch) if elem == epoch[i]][0]
+		filepath = dirpath + p_files[ind]
+		dict, cost, fugue = extract_from_pickle(filepath)
+		plt.plot(dict['predict'][0], c[i%4])
 	
+	plt.title(str(len(epoch)) + ' epochs')
+
+
+'''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
+   ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
+
 if __name__ == '__main__':
 	dirpath = '/Users/ozkansafak/Bach2.0/Source_Code/Synthesized_Fugues/new/'
 		
 	p_files = get_fugue_pickle_filepaths(dirpath)
+	#get all the epochs
 	epoch =[]
 	for fname in p_files:
 		epoch.append(int(fname.split('epoch')[1].split('.')[0]))
 		
 	ind = np.argmax(epoch)
-	ind = [i for i,elem in enumerate(epoch) if elem == 200][0]
+	ind = [i for i,elem in enumerate(epoch) if elem == 1][0]
 	filepath = dirpath + p_files[ind]
 	dict, cost, fugue = extract_from_pickle(filepath)
 	
@@ -72,4 +101,13 @@ if __name__ == '__main__':
 	#
 	# time_series = pitch_matrix_TO_time_series_legato(fugue, sh=24)
 	# time_series_TO_midi_file(time_series)
+
+
+
+
+
+
+
+
+
 

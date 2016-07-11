@@ -15,14 +15,14 @@ NUM_FEATURES = None
 X = None
 Y = None
 SEQUENCE_LENGTH = 16
-BATCH_SIZE = 160
+BATCH_SIZE = 48
 LEARNING_RATE = .01
-NUM_UNITS = 256
+NUM_UNITS = 512
 NUM_EPOCHS = 5000
 PRINT_FREQ = 100
-GRAD_CLIPPING = 100
+GRAD_CLIPPING = 10
 THRESHOLD = .5
-CLIP_PITCH_MATRIX = 4800*2
+CLIP_PITCH_MATRIX = 4800
 data_size = None
 # 
 # 
@@ -73,7 +73,7 @@ def generate_a_fugue(epoch, cost, N=16*32):
 	# Advance the RNN model for N steps at its current state.
 	fugue = np.zeros((N, NUM_FEATURES))
 	#
-	x, _ = make_batch(1000, X, Y, data_size, 1)
+	x, _ = make_batch(0, X, Y, data_size, 1)
 	print "epoch={}".format(epoch)
 	for i in range(N):
 		'''
@@ -82,7 +82,7 @@ def generate_a_fugue(epoch, cost, N=16*32):
 		'''
 		#
 		predict = probabilities(x) # predict.shape = (1, 61)
-		ix = np.argmax(predict, axis=1)
+		ix = np.argmax(predict)
 		#
 		fugue[i][ix] = 1 
 		x[0, :-1, :] = x[:, 1:, :] 
@@ -108,6 +108,7 @@ def generate_a_fugue(epoch, cost, N=16*32):
 				'data_size' : data_size,
 				'GRAD_CLIPPING' : GRAD_CLIPPING,
 				'CLIP_PITCH_MATRIX' : CLIP_PITCH_MATRIX,
+				'predict' : predict, 
 				'cost' : cost,
 				'fugue' : fugue}
 	#
@@ -132,13 +133,13 @@ def build_rnn(sequence_length=SEQUENCE_LENGTH, num_units=NUM_UNITS):
 	# LSTM Layer
 	l_LSTM1 = LSTMLayer(l_in, num_units=num_units, grad_clipping=GRAD_CLIPPING, nonlinearity=tanh)
 	# 2nd LSTM Layer
-	l_LSTM2 = LSTMLayer(l_LSTM1, num_units=num_units, grad_clipping=GRAD_CLIPPING, nonlinearity=tanh)
+	'''l_LSTM2 = LSTMLayer(l_LSTM1, num_units=num_units, grad_clipping=GRAD_CLIPPING, nonlinearity=tanh)'''
 	# The l_forward layer creates an output of dimension (batch_size, SEQ_LENGTH, N_HIDDEN)
 	# Since we are only interested in the final prediction, we isolate that quantity and feed it to the next layer. 
 	# The output of the sliced layer will then be of size (batch_size, N_HIDDEN)
-	l_slice = SliceLayer(l_LSTM2, -1, 1)
+	'''l_slice = SliceLayer(l_LSTM2, -1, 1)'''
 	# output layer
-	l_out = DenseLayer(l_slice, num_units=NUM_FEATURES, nonlinearity=sigmoid)
+	l_out = DenseLayer(l_LSTM1, num_units=NUM_FEATURES, nonlinearity=sigmoid)
 	return l_in, l_out
 	
 '''||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
