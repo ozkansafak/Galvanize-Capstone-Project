@@ -559,12 +559,3 @@ cost function was reduced but the generated melody was only a single pitch.
 Now, I got to run it with 2 hidden layers and `GRAD_CLIPPING=10`. It already 
 is performing better at epoch 200 with a full melody produced. Code is running.
 
----
-
-##### *July 8, 2016 - Friday*
-
-gonna look at predict
-
-.  
-.  
-. 
