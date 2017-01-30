@@ -22,10 +22,10 @@ SEQ_LENGTH = 64
 BATCH_SIZE = 256
 LEARNING_RATE = 1e-3
 NUM_UNITS = 256
-NUM_EPOCHS = 500
-PRINT_FREQ = 10
+NUM_EPOCHS = 2000
+PRINT_FREQ = 25
 GRAD_CLIPPING = 100 
-data_size = BATCH_SIZE*32
+data_size = BATCH_SIZE*220
 
 # 
 print "\n\n\n\n\n\n==================================================="
