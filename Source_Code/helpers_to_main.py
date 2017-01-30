@@ -1,23 +1,26 @@
-import numpy as np	
+import numpy as np
 import midi
 
-
-def adjust_pitch_matrix(pitch_matrix, data_size, batch_size, num_features):
+'''def adjust_pitch_matrix(pitch_matrix, data_size, batch_size, num_features, sequence_length):
 	p = (data_size / batch_size) * batch_size
 	leftOver = (p+batch_size) % (data_size)
 	if leftOver > 0:
 		print "adjust_pitch_matrix(): Broken batch. leftOver =", leftOver
-		pitch_matrix = np.concatenate((pitch_matrix,np.zeros((leftOver,num_features))), axis=0)
+		# clip pitch_matrix so batch_size is an integer multiple of  
+		pitch_matrix = pitch_matrix[:p+sequence_length] 
+		data_size = pitch_matrix.shape[0] - sequence_length
+		
+		# pitch_matrix = np.concatenate((pitch_matrix,np.zeros((leftOver,num_features))), axis=0)
 		print 'adjust_pitch_matrix reports: pitch_matrix.shape =', pitch_matrix.shape
 
-	return pitch_matrix, data_size + leftOver
+	return pitch_matrix, data_size'''
 
 def make_X_Y(pitch_matrix, data_size, sequence_length, num_features):
-
+	'''pitch_matrix.shape '''
 	X = np.zeros((data_size, sequence_length, num_features))
 	Y = np.zeros((data_size, num_features))
 	
-	for i in range(data_size):
+	for i in xrange(data_size):
 		X[i, : , :] = pitch_matrix[i : i+sequence_length, :]
 		Y[i, :] = pitch_matrix[i+sequence_length]
 
@@ -33,7 +36,7 @@ def make_batch(p, X, Y, data_size, batch_size):
 		# next batch: [12,13,14,15,16,17]
 		# leftOver = 2
 		leftOver = (p+batch_size) % (data_size)
-		print "\nmake_batch(): Broken batch. leftOver=", leftOver
+		print "\nmake_batch(): MAJOR FUCKUP!! Broken batch. leftOver=", leftOver
 
 		x = X[p:]
 		y = Y[p:]
@@ -46,6 +49,7 @@ def make_batch(p, X, Y, data_size, batch_size):
 		#
 	return x, y
 
+	
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
    \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
@@ -62,7 +66,7 @@ def flatten_pitch_matrix(pitch_matrix):
 	'''
 	# flatten pitch_matrix
 	pitch_matrix_long = pitch_matrix[0]
-	for n in range(len(pitch_matrix)-1):
+	for n in xrange(len(pitch_matrix)-1):
 		pitch_matrix_long = np.column_stack((pitch_matrix_long, pitch_matrix[n+1]))
 
 	# transpose it to swap the axes. 

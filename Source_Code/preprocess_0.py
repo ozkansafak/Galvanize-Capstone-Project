@@ -31,10 +31,8 @@ def plot_canonical_chords_vector():
 	plt.ion()
 	plt.show()
 	
-
-
-def plot_pitch_matrix(pitch_matrix, title=None, xlabel=None, ylabel=None):
 	
+def plot_pitch_matrix(pitch_matrix, title=None, xlabel=None, ylabel=None):
 	fig, ax = plt.subplots(figsize=(21,8))
 	heatmap = ax.pcolor(pitch_matrix, cmap=plt.cm.Blues)
 	plt.title(title, fontsize = 24)
@@ -43,7 +41,6 @@ def plot_pitch_matrix(pitch_matrix, title=None, xlabel=None, ylabel=None):
 	ax = plt.gca()
 	ax.set_xlim([0, pitch_matrix.shape[1]])
 	ax.set_ylim([0, pitch_matrix.shape[0]])
-	
 	
 	plt.ion()
 	plt.show()

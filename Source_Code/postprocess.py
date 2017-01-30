@@ -1,5 +1,5 @@
 import matplotlib.pylab as plt	
-import os, pickle, numpy as np
+import os, sys, pickle, numpy as np
 from preprocess_0 import plot_pitch_matrix
 from helpers_to_main import pitch_matrix_TO_time_series_legato, time_series_TO_midi_file
 
@@ -33,8 +33,13 @@ def extract_from_pickle(filepath):
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
 	
+def sorted_ls(dirpath):
+    mtime = lambda f: os.stat(os.path.join(dirpath, f)).st_mtime
+    return list(sorted(os.listdir(dirpath), key=mtime))
+
+
 def get_fugue_pickle_filepaths(dirpath):
-	dir = os.listdir(dirpath)
+	dir = sorted_ls(dirpath)
 	p_files = []
 	for f in dir:
 	    if f.startswith('fugue') and f.endswith('.p'):
@@ -74,16 +79,28 @@ def plot_predicts():
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
 
 if __name__ == '__main__':
+	
 	dirpath = '/Users/ozkansafak/Bach2.0/Source_Code/Synthesized_Fugues/new/'
 		
 	p_files = get_fugue_pickle_filepaths(dirpath)
-	#get all the epochs
+	# get all the epochs
 	epoch =[]
 	for fname in p_files:
 		epoch.append(int(fname.split('epoch')[1].split('.')[0]))
-		
-	ind = np.argmax(epoch)
-	ind = [i for i,elem in enumerate(epoch) if elem == 1][0]
+	
+	if len(sys.argv) > 1:
+		ind = [i for i,v in enumerate(epoch) if v == int(sys.argv[1])]
+		if len(ind) > 1:
+			print '{} files found'.format(len(ind))
+			for q in ind:
+				print p_files[q]
+			ind = ind[-1]
+			print 'picking: {}'.format(p_files[ind])
+		else:
+			ind = ind[0]
+	else:
+		ind = len(p_files)-1
+
 	filepath = dirpath + p_files[ind]
 	dict, cost, fugue = extract_from_pickle(filepath)
 	
@@ -98,16 +115,5 @@ if __name__ == '__main__':
 			print k, ':', dict[k]
 	
 	#
-	#
 	# time_series = pitch_matrix_TO_time_series_legato(fugue, sh=24)
 	# time_series_TO_midi_file(time_series)
-
-
-
-
-
-
-
-
-
-
