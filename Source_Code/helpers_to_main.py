@@ -28,7 +28,8 @@ def make_X_Y(pitch_matrix, data_size, sequence_length, num_features):
 	
 
 def make_batch(p, X, Y, data_size, batch_size):
-	if p+batch_size-1 <= data_size-1:
+	if p-batch_size-1 <= data_size-1:
+		# print "batch_size={}, data_size={}, p={}".format(batch_size,data_size,p)
 		x = X[p : p+batch_size]
 		y = Y[p : p+batch_size]
 	else:

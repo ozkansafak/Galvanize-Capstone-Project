@@ -6,12 +6,12 @@ from helpers_to_main import pitch_matrix_TO_time_series_legato, time_series_TO_m
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
 
-def plot_cost(cost, title=''):
+def plot_loss(loss, title=''):
 	
 	fig = plt.figure(figsize=(9,5))
-	x_axis = np.linspace(1,len(cost),len(cost))
+	x_axis = np.linspace(1,len(loss),len(loss))
 	ax = fig.gca()
-	ax.semilogy(x_axis, cost, label='cost', linewidth=2.0)
+	ax.semilogy(x_axis, loss, label='loss', linewidth=2.0)
 	ax.grid('on')
 	
 	plt.title(title)
@@ -25,10 +25,10 @@ def plot_cost(cost, title=''):
 	
 def extract_from_pickle(filepath):
 	dict = pickle.load(open(filepath, 'rb'))
-	cost = dict['cost']
+	loss = dict['loss']
 	fugue = dict['fugue']
 	
-	return dict, cost, fugue
+	return dict, loss, fugue
 	
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
@@ -69,7 +69,7 @@ def plot_predicts():
 	for i in range(len(p_files)):
 		ind = [j for j, elem in enumerate(epoch) if elem == epoch[i]][0]
 		filepath = dirpath + p_files[ind]
-		dict, cost, fugue = extract_from_pickle(filepath)
+		dict, loss, fugue = extract_from_pickle(filepath)
 		plt.plot(dict['predict'][0], c[i%4])
 	
 	plt.title(str(len(epoch)) + ' epochs')
@@ -102,11 +102,10 @@ if __name__ == '__main__':
 		ind = len(p_files)-1
 
 	filepath = dirpath + p_files[ind]
-	dict, cost, fugue = extract_from_pickle(filepath)
-	
+	dict, loss, fugue = extract_from_pickle(filepath)
 	
 	plot_pitch_matrix(np.transpose(fugue), title=p_files[ind], xlabel='16th note time-step', ylabel='pitch')
-	plot_cost(cost,title=p_files[ind])
+	plot_loss(loss, title=p_files[ind])
 	
 	print "\nfilepath = {}\n{}\n".format(filepath,'-'*(len(dirpath)+10))
 	print 
