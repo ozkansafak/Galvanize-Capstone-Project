@@ -2,7 +2,9 @@ Source_Code/*.mid
 Source_Code/*.pyc
 Source_Code/*.p
 Source_Code/training_data/*.p
-Source_Code/Synthesized_Fugues/new/*.wav
 Source_Code/Synthesized_Fugues/*.wav
 Source_Code/Synthesized_Fugues/*.p
+Source_Code/Synthesized_Fugues/new/*.wav
+Source_Code/Synthesized_Fugues/new/*.p
+Source_Code/Synthesized_Fugues/new/*.mid
 .DS_Store

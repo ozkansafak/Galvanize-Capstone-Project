@@ -91,7 +91,7 @@ if __name__ == '__main__':
 	if len(sys.argv) > 1:
 		ind = [i for i,v in enumerate(epoch) if v == int(sys.argv[1])]
 		if len(ind) > 1:
-			print '{} files found'.format(len(ind))
+			print '{} files found:'.format(len(ind))
 			for q in ind:
 				print p_files[q]
 			ind = ind[-1]
