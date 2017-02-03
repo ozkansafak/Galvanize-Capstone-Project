@@ -1,5 +1,47 @@
 import numpy as np
 import midi
+import pickle 
+
+def load_n_flatten_pitch_matrix():
+	print "\n\n-------------------------------"
+	print "Loading pitch_matrix ..."
+	sh = 0
+	pitch_matrix = pickle.load(open('training_data/pitch_matrix_'+str(96/4)+'ticks_sh'+"%02d" % (sh,)+'.p', 'rb'))
+	# at this point, pitch_matrix is a list of 2D lists. 
+	# pitch_matrix[i] is a fugue in the training set, for each i.
+
+	# flatten pitch_matrix into a single 2D ndarray
+	pitch_matrix = flatten_pitch_matrix(pitch_matrix)
+	
+	return pitch_matrix
+	
+	
+def print_inputs(NUM_LAYERS, NUM_NEURONS, NUM_FEATURES,
+				SEQ_LENGTH, BATCH_SIZE, LEARNING_RATE,
+				PRINT_FUGUES, data_size, pitch_matrix, 
+				full_data_size):
+	# print the network architecture
+	print '\n\t-----------------------------'
+	print '\t Network Architecture:\n'
+	for _ in range(3):
+		print ' '*12 + '       ' + 'O      '*NUM_LAYERS + ' '
+	for _ in range(4):
+		print ' '*12 + 'O      ' + 'O      '*NUM_LAYERS + 'O'
+	for _ in range(3):
+		print ' '*12 + '       ' + 'O      '*NUM_LAYERS + ' '
+	print ' '*12 + " "
+	unit_no = "%3d" % (NUM_NEURONS,) + " "*4 
+	print ' '*12+"%2d" % (NUM_FEATURES,) + " "*4 + unit_no*NUM_LAYERS + " %2d" % (NUM_FEATURES,)  
+
+	print '\n\t-----------------------------'
+	print '\tSEQ_LENGTH = {}'.format(SEQ_LENGTH)
+	print '\tBATCH_SIZE = {}'.format(BATCH_SIZE) 
+	print '\tLEARNING_RATE = {}'.format(LEARNING_RATE)
+	print '\tdata_size = {} ({}% of available BWV data)'.format(data_size,round(100.*data_size/full_data_size,2))
+	print '\tPRINT_FUGUES = {}'.format(PRINT_FUGUES)
+	print '\t-----------------------------\n'
+	
+	return
 
 '''def adjust_pitch_matrix(pitch_matrix, data_size, batch_size, num_features, sequence_length):
 	p = (data_size / batch_size) * batch_size

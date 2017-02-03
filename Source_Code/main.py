@@ -10,10 +10,7 @@ import pickle
 import time
 from helpers_to_main import *
 
-t0 = time.time()
-# Lasagne Seed for Reproducibility
-lasagne.random.set_rng(np.random.RandomState(1))
-
+# ------------------------- #
 # Declare Global Variables
 NUM_FEATURES = None
 X = None
@@ -22,27 +19,25 @@ SEQ_LENGTH = 32
 BATCH_SIZE = 256
 LEARNING_RATE = 1e-3
 NUM_EPOCHS = 2000
-PRINT_FUGUES = 25
+PRINT_FUGUES = 20
 GRAD_CLIPPING = 100
-NUM_NEURONS = 64
-NUM_LAYERS = 10
-data_size = BATCH_SIZE*228
+NUM_NEURONS = 512
+NUM_LAYERS = 2
+data_size = BATCH_SIZE*(228)
+# ------------------------- #
 
+t0 = time.time()
+# Lasagne Seed for Reproducibility
+lasagne.random.set_rng(np.random.RandomState(1))
 np.random.seed(0)
-print "\n\n-------------------------------"
-print "Loading pitch_matrix ..."
-sh = 0
-pitch_matrix = pickle.load(open('training_data/pitch_matrix_'+str(96/4)+'ticks_sh'+"%02d" % (sh,)+'.p', 'rb'))
-# at this point, pitch_matrix is a list of 2D lists. 
-# pitch_matrix[i] is a fugue in the training set, for each i.
 
-# flatten pitch_matrix into a single 2D ndarray
-pitch_matrix = flatten_pitch_matrix(pitch_matrix)
+pitch_matrix = load_n_flatten_pitch_matrix()
 NUM_FEATURES = pitch_matrix.shape[1]  # 61
- 
+full_data_size = pitch_matrix.shape[0]-SEQ_LENGTH
+
 # extract only lowest notes
-pitch_matrix = make_monophonic(pitch_matrix) 
-# clip pitch_matrix for testing purposes.
+pitch_matrix = make_monophonic(pitch_matrix)
+# clip pitch_matrix to an integer multiple of BATCH_SIZE
 if data_size < pitch_matrix.shape[0] - SEQ_LENGTH:
 	clipped_pitch_matrix_length = data_size + SEQ_LENGTH 
 	print 'pitch_matrix original, pitch_matrix.shape = {}'.format(pitch_matrix.shape)
@@ -51,33 +46,31 @@ if data_size < pitch_matrix.shape[0] - SEQ_LENGTH:
 else:
 	print '!!!!!!pitch_matrix NOT clipped, pitch_matrix.shape = {}'.format(pitch_matrix.shape)
 
-
-# print the network architecture
-print '\n\t-----------------------------\n'
-for _ in range(3):
-	print ' '*12 + '       ' + 'O      '*NUM_LAYERS + ' '
-for _ in range(4):
-	print ' '*12 + 'O      ' + 'O      '*NUM_LAYERS + 'O'
-for _ in range(3):
-	print ' '*12 + '       ' + 'O      '*NUM_LAYERS + ' '
-print ' '*12 + " "
-unit_no = "%3d" % (NUM_NEURONS,) + " "*4 
-print ' '*12+"%2d" % (NUM_FEATURES,) + " "*4 + unit_no*NUM_LAYERS + " %2d" % (NUM_FEATURES,)  
-
-print '\n\t-----------------------------'
-print '\tSEQ_LENGTH = {}'.format(SEQ_LENGTH)
-print '\tBATCH_SIZE = {}'.format(BATCH_SIZE) 
-print '\tLEARNING_RATE = {}'.format(LEARNING_RATE)
-print '\tdata_size = {}'.format(data_size)
-print '\tPRINT_FUGUES = {}'.format(PRINT_FUGUES)
-print '\t-----------------------------\n'
-
+print_inputs(NUM_LAYERS, NUM_NEURONS, NUM_FEATURES,
+			SEQ_LENGTH, BATCH_SIZE, LEARNING_RATE,
+			PRINT_FUGUES, data_size, pitch_matrix,
+			full_data_size)
+			
 '''||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||
    \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
 
+def pick_from_pdf(pdf, how_many=SEQ_LENGTH):
+	# take top 4 notes only. 
+	ind = np.argsort(pdf)[-how_many:]
+	#normalize
+	top_4_pdf = pdf[ind]/np.sum(pdf[ind])
+	# sample from uniform distribution
+	p = np.random.rand()
+	# map this uniform random variable to adjusted pdf of top 4 notes.
+	cdf = np.cumsum(top_4_pdf)
+	return ind[len(cdf[cdf < p])]
+	
+
 def next_note(x):
-	predict = probabilities(x)
-	ix = np.argmax(predict)
+	pdf = probabilities(x)
+	# pdf.shape = (1,NUM_FEATURES)
+	ix = pick_from_pdf(pdf[0,:])
+	# ix = np.argmax(pdf)
 	note = np.zeros((1,NUM_FEATURES))
 	note[0,ix] = 1
 	return note
@@ -88,7 +81,7 @@ def generate_a_fugue(epoch, loss, N=16*32):
 	N: How many steps the fugue is to be generated for. 
 	'''
 	
-	# Advance the RNN model for N steps at its current state.
+	# Advance the RNN model for N steps.
 	fugue = np.zeros((N, NUM_FEATURES))
 	
 	x = np.zeros_like(x_seed)
@@ -160,20 +153,20 @@ def build_rnn(sequence_length=SEQ_LENGTH, num_units=NUM_NEURONS):
 	
 '''||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  
    \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  '''
-#x_seed_from_training = np.zeros((1, SEQ_LENGTH, NUM_FEATURES))
-#x_seed_from_training[0] = pitch_matrix[:SEQ_LENGTH]
-#x_seed = np.asarray([val for i,val in enumerate(x_seed_from_training[0,:,:]) if i%2 == 0])
 
 x_seed = np.zeros((1, SEQ_LENGTH, NUM_FEATURES))
 for i, val in enumerate(pitch_matrix[:SEQ_LENGTH/2,:]):
-	x_seed[0,i,:] = val
 	x_seed[0,i*2,:] = val
+	x_seed[0,i*2+1,:] = val
+
+x_seed[0] = pitch_matrix[:SEQ_LENGTH]
 
 
 print "Building network ..."
 num_of_params = NUM_FEATURES * NUM_NEURONS*2 + (NUM_NEURONS + NUM_FEATURES) \
-					+ (NUM_LAYERS-1) * (NUM_NEURONS**2) + (NUM_NEURONS*(NUM_LAYERS-1))
-print 'total no of params to be learned:{}'.format(num_of_params)
+					+ (NUM_LAYERS-1) * (NUM_NEURONS**2) + (NUM_NEURONS*(NUM_LAYERS-1)) \
+					+ NUM_LAYERS * NUM_NEURONS * (NUM_NEURONS+1)
+print 'total no of params to be learned: {}'.format(num_of_params)
 
 l_in, l_out = build_rnn()
 target_values = T.imatrix('target_output')
@@ -228,7 +221,7 @@ for it in xrange(1, data_size * NUM_EPOCHS / BATCH_SIZE + 1):
 		# print "epoch {} completed. Reset: avg_loss=0, p=0".format(epoch)
 		sys.stdout.flush()
 		print "At epoch:", round(epoch,3),", avg_loss=", avg_loss," "*99,"\r",
-		time.sleep(1)
+		# time.sleep(.1)
 		if epoch % PRINT_FUGUES == 0.0:
 			# generate a fugue every PRINT_FUGUES epochs
 			generate_a_fugue(epoch=epoch, loss=loss_p) 
