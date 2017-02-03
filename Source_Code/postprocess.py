@@ -6,13 +6,19 @@ from helpers_to_main import pitch_matrix_TO_time_series_legato, time_series_TO_m
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
 
-def plot_loss(loss, title=''):
+def plot_loss(loss, time_delta, title='', skip=20):
 	
 	fig = plt.figure(figsize=(9,5))
-	x_axis = np.linspace(1,len(loss),len(loss))
+	x_axis = np.linspace(0,len(loss)-1,len(loss))
 	ax = fig.gca()
 	ax.semilogy(x_axis, loss, label='loss', linewidth=2.0)
 	ax.grid('on')
+	
+	for i, L in enumerate(loss):
+		if (i % skip == 0) and (L != 0):			
+			print x_axis[i], L, sum(time_delta[i-skip+1:i+1])
+			ax.text(x_axis[i], L,  str(round(sum(time_delta[i-skip+1:i+1]),2)),
+					horizontalalignment='left',rotation=45)
 	
 	plt.title(title)
 	plt.xlabel('epochs')
@@ -27,8 +33,8 @@ def extract_from_pickle(filepath):
 	dict = pickle.load(open(filepath, 'rb'))
 	loss = dict['loss']
 	fugue = dict['fugue']
-	
-	return dict, loss, fugue
+	time_delta = dict['time_delta']
+	return dict, loss, time_delta, fugue
 	
 '''/\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\ 
    ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  ||  || '''
@@ -69,7 +75,7 @@ def plot_predicts():
 	for i in range(len(p_files)):
 		ind = [j for j, elem in enumerate(epoch) if elem == epoch[i]][0]
 		filepath = dirpath + p_files[ind]
-		dict, loss, fugue = extract_from_pickle(filepath)
+		dict, loss, _, fugue = extract_from_pickle(filepath)
 		plt.plot(dict['predict'][0], c[i%4])
 	
 	plt.title(str(len(epoch)) + ' epochs')
@@ -100,12 +106,17 @@ if __name__ == '__main__':
 			ind = ind[0]
 	else:
 		ind = len(p_files)-1
-
+	
+	if len(p_files) == 0:
+		print "\nERROR: No .p files at:\n\n\t\t" + dirpath + "\n\nRun `scpget` on the terminal"
+		sys.exit()
+		
+	
 	filepath = dirpath + p_files[ind]
-	dict, loss, fugue = extract_from_pickle(filepath)
+	dict, loss, time_delta, fugue = extract_from_pickle(filepath)
 	
 	plot_pitch_matrix(np.transpose(fugue), title=p_files[ind], xlabel='16th note time-step', ylabel='pitch')
-	plot_loss(loss, title=p_files[ind])
+	plot_loss(loss, time_delta, title=p_files[ind])
 	
 	print "\nfilepath = {}\n{}\n".format(filepath,'-'*(len(dirpath)+10))
 	print 

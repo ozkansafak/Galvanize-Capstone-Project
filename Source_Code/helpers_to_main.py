@@ -1,6 +1,75 @@
 import numpy as np
 import midi
 import pickle 
+import itertools
+import time
+
+def append_to_loss_and_time_delta(loss_p,time_delta,avg_loss,t_before):
+	loss_p.append(avg_loss)
+	t = time.time()
+	time_delta = np.append(time_delta, t-t_before)
+	t_before = t
+
+	return loss_p, time_delta, t_before
+
+
+def compute_prime_factors(n):
+	n = int(n)
+	i = 2
+	prime_factors = []
+	while i * i <= n:
+		if n % i:
+			i += 1
+		else:
+			n //= i
+			prime_factors.append(i)
+	if n > 1:
+		prime_factors.append(n)
+	return prime_factors
+
+
+
+def compute_factors(data_size, bs0):
+	prime_factors = compute_prime_factors(data_size)
+	factors_repeated = []
+	
+	for L in range(1, len(prime_factors)+1):
+	  for subset in itertools.combinations(prime_factors, L):
+	     factors_repeated.append(reduce(lambda x,y: x*y, subset))
+
+	factors_repeated.sort(reverse=False) # in-place sort. Ascending
+
+	factors = [factors_repeated[0]]
+	for val in factors_repeated:
+		if factors[-1] != val:
+			factors.append(val)
+
+	factors = np.asarray(factors)
+
+	return factors[factors>=bs0]
+	
+	
+def compute_epoch(epoch, BATCH_SIZE, data_size, bs0, e0=200):
+
+	# Advance the epoch with current BATCH_SIZE
+	epoch += float(BATCH_SIZE) / data_size
+	if np.abs(np.float(epoch) - np.round(epoch)) < 1e-8: 
+		epoch = round(epoch)
+		# we're starting a new epoch
+		factors = compute_factors(data_size, bs0)
+	
+		# compute adaptive BATCH_SIZE
+		# At e0 = 200.0, BATCH_SIZE = data_size
+		bs = (data_size-bs0) * (np.floor(epoch)/float(e0))**2 + bs0 
+		
+		bs_candidate = factors[factors <= bs].max()
+		if bs_candidate != BATCH_SIZE:
+		 	BATCH_SIZE = bs_candidate
+			print "At epoch:", round(epoch,3),", BATCH_SIZE=", BATCH_SIZE, " "*99
+		
+	
+	return epoch, BATCH_SIZE
+
 
 def load_n_flatten_pitch_matrix():
 	print "\n\n-------------------------------"
@@ -69,27 +138,11 @@ def make_X_Y(pitch_matrix, data_size, sequence_length, num_features):
 	return X, Y
 	
 
-def make_batch(p, X, Y, data_size, batch_size):
-	if p-batch_size-1 <= data_size-1:
-		# print "batch_size={}, data_size={}, p={}".format(batch_size,data_size,p)
-		x = X[p : p+batch_size]
-		y = Y[p : p+batch_size]
-	else:
-		# p = 12; batch_size = 6; data_size = 16
-		# next batch: [12,13,14,15,16,17]
-		# leftOver = 2
-		leftOver = (p+batch_size) % (data_size)
-		print "\nmake_batch(): MAJOR FUCKUP!! Broken batch. leftOver=", leftOver
-
-		x = X[p:]
-		y = Y[p:]
-		# reset p
-		x1 = X[:leftOver]
-		y1 = Y[:leftOver]
-		#
-		x = np.concatenate((x,x1), axis=0)
-		y = np.concatenate((y,y1), axis=0)
-		#
+def make_batch(p, X, Y, data_size, batch_size,index):
+	# random shuffle the training data X,Y,
+	# Then take batch_size many
+	x = X[index[p : p+batch_size]]
+	y = Y[index[p : p+batch_size]]
 	return x, y
 
 	

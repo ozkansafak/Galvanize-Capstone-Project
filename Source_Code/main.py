@@ -21,9 +21,9 @@ LEARNING_RATE = 1e-3
 NUM_EPOCHS = 2000
 PRINT_FUGUES = 20
 GRAD_CLIPPING = 100
-NUM_NEURONS = 512
-NUM_LAYERS = 2
-data_size = BATCH_SIZE*(228)
+NUM_NEURONS = 256
+NUM_LAYERS = 1
+data_size = BATCH_SIZE*(228/19)
 # ------------------------- #
 
 t0 = time.time()
@@ -75,7 +75,7 @@ def next_note(x):
 	note[0,ix] = 1
 	return note
 
-def generate_a_fugue(epoch, loss, N=16*32):
+def generate_a_fugue(epoch, loss, time_delta, N=16*32):
 	'''
 	INPUT:  epoch and loss: Passed just to name the output files.	
 	N: How many steps the fugue is to be generated for. 
@@ -114,6 +114,7 @@ def generate_a_fugue(epoch, loss, N=16*32):
 				'NUM_LAYERS' : NUM_LAYERS,
 				'data_size' : data_size,
 				'loss' : loss,
+				'time_delta' : time_delta,
 				'fugue' : fugue}
 	
 	pickle.dump(dump_dict, open('Synthesized_Fugues/'+filename+'.p', 'wb'))
@@ -132,7 +133,6 @@ def generate_a_fugue(epoch, loss, N=16*32):
 
 def build_rnn(sequence_length=SEQ_LENGTH, num_units=NUM_NEURONS):
 	# input layer
-	# generate the data to pass into this
 	l_in = InputLayer(shape=(None, sequence_length, NUM_FEATURES))
 	l_LSTMs = [LSTMLayer(l_in, num_units=num_units, 
 						grad_clipping=GRAD_CLIPPING, nonlinearity=tanh)]
@@ -159,7 +159,7 @@ for i, val in enumerate(pitch_matrix[:SEQ_LENGTH/2,:]):
 	x_seed[0,i*2,:] = val
 	x_seed[0,i*2+1,:] = val
 
-x_seed[0] = pitch_matrix[:SEQ_LENGTH]
+# x_seed[0] = pitch_matrix[:SEQ_LENGTH]
 
 
 print "Building network ..."
@@ -202,34 +202,35 @@ probabilities = theano.function([l_in.input_var], network_output, allow_input_do
 print "Training ..."
 X, Y = make_X_Y(pitch_matrix, data_size, SEQ_LENGTH, NUM_FEATURES)
 
-p, avg_loss, dummy_previous, loss_p = 0, 0, -1, []
-for it in xrange(1, data_size * NUM_EPOCHS / BATCH_SIZE + 1):
-	epoch = float(it) * float(BATCH_SIZE) / data_size
-	#sys.stdout.flush();	print "it:", it, ", epoch:", round(epoch,3),"        \r",
-	x, y = make_batch(p, X, Y, data_size, BATCH_SIZE)
+p, avg_loss, loss_p, time_delta = 0, 0, [0], [0]
+epoch, bs0 = 0, BATCH_SIZE
+t_before = np.asarray(time.time())
+
+index = np.arange(data_size)
+np.random.shuffle(index)
+
+
+
+while epoch < NUM_EPOCHS:	
+	x, y = make_batch(p, X, Y, data_size, BATCH_SIZE,index)
 	avg_loss += train_function(x, y)
 	
-	
 	p = p + BATCH_SIZE
-	dummy_previous = epoch % PRINT_FUGUES
+	epoch, BATCH_SIZE = compute_epoch(epoch, BATCH_SIZE, data_size, bs0, e0=200)
 	
 	if epoch == 1.0:
 		print "At epoch:", round(epoch,3),", avg_loss=", avg_loss
 
-	if p == data_size :
+	if np.abs(np.float(epoch) - np.round(epoch)) < 1e-8:
 		# Another epoch completed.
-		# print "epoch {} completed. Reset: avg_loss=0, p=0".format(epoch)
 		sys.stdout.flush()
 		print "At epoch:", round(epoch,3),", avg_loss=", avg_loss," "*99,"\r",
-		# time.sleep(.1)
+		loss_p, time_delta ,t_before = append_to_loss_and_time_delta(loss_p,time_delta,avg_loss,t_before)
+		
 		if epoch % PRINT_FUGUES == 0.0:
 			# generate a fugue every PRINT_FUGUES epochs
-			generate_a_fugue(epoch=epoch, loss=loss_p) 
-			print "At epoch:", round(epoch,3),", avg_loss=", avg_loss,", .mid and .p files saved. t =", round(time.time()-t0),"sec."
+			generate_a_fugue(epoch=epoch, loss=loss_p, time_delta=time_delta) 
+			print "At epoch:{}, avg_loss={}, .mid & .p files saved, t={}sec.".format(round(epoch,3), avg_loss, round(time.time()-t0))
 	
-		loss_p.append(avg_loss)
-		p = 0
-		avg_loss = 0
-
-	
+		p, avg_loss = 0, 0
 
